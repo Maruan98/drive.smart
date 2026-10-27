@@ -866,7 +866,7 @@ footer .refs{line-height:1.7}
   <div class="wrap pwrap">
     <a class="back" href="#garage">← Back to the Garage</a>
     <h1>I hear a squeal when I brake. Do I need new pads?</h1>
-    <div class="byline"><span class="av" style="background:#24375F">MH</span><span>By <b>Maruan Hdioud</b> · Editor · 4 min read</span></div>
+    <div class="byline"><span class="av" style="background:#24375F">MH</span><span>By <a class="who" href="#u-HwRn0NLKuoccFgKcmeaKIg9OwTr2">Maruan Hdioud</a> · Editor · 4 min read</span></div>
     <p class="lede">You press the brake and hear a high-pitched squeal. It is the most common noise a car can make, and probably the one that scares people the most. The good news: most of the time it is not dangerous at all. It is your car politely telling you something.</p>
 
     <h2>Why brakes squeal</h2>
@@ -929,10 +929,13 @@ if(!FIREBASE_CONFIG){try{member=JSON.parse(lsGet('ds-member')||'null')}catch(e){
 function saveMember(){lsSet('ds-member',member?JSON.stringify(member):null)}
 
 /* ---------- FEED: editors' first posts ---------- */
+/* editors: their posts and replies get the Editor badge */
+var EDITOR_MARUAN='HwRn0NLKuoccFgKcmeaKIg9OwTr2';
+var EDITORS={};EDITORS[EDITOR_MARUAN]=true;
 var threads=[
  {id:'top2-cars',f:'buy',kind:'Buying guide',fc:'',t:'Our top 2 first cars under $10k',ex:'Corolla or Civic? The years to look for, what to check before buying, and the fair price so you don\'t overpay.',who:'Cesar Breitner',role:'Editor',av:'#7A5A2E',link:'#post-cars'},
- {id:'brake-squeal',f:'fix',kind:'Fix Smart',fc:'',t:'I hear a squeal when I brake. Do I need new pads?',ex:'The most common car noise, and the one that scares people the most. Why it happens, when it gets serious, and what it should cost in Kingston.',who:'Maruan Hdioud',role:'Editor',av:'#24375F',link:'#post-brakes'},
- {id:'first-car',f:'talk',kind:'Open discussion',fc:'talk',t:'What was your first car? Tell us the story',ex:'Good or bad, we want to hear it. Create a free account to reply.',who:'Maruan Hdioud',role:'Editor',av:'#24375F'}
+ {id:'brake-squeal',uid:EDITOR_MARUAN,f:'fix',kind:'Fix Smart',fc:'',t:'I hear a squeal when I brake. Do I need new pads?',ex:'The most common car noise, and the one that scares people the most. Why it happens, when it gets serious, and what it should cost in Kingston.',who:'Maruan Hdioud',role:'Editor',av:'#24375F',link:'#post-brakes'},
+ {id:'first-car',uid:EDITOR_MARUAN,f:'talk',kind:'Open discussion',fc:'talk',t:'What was your first car? Tell us the story',ex:'Good or bad, we want to hear it. Create a free account to reply.',who:'Maruan Hdioud',role:'Editor',av:'#24375F'}
 ];
 var filt='all';
 function initials(n){return String(n||'?').split(/\s/).filter(Boolean).map(function(s){return s[0]}).join('').slice(0,2).toUpperCase()}
@@ -987,7 +990,7 @@ function renderFeed(){
     var a=el('article','thread');
     var m=el('div','meta');m.appendChild(t.uid?avatar(t.who,t.uid):(function(){var x=el('span','av',t.who==='Example'?'?':initials(t.who));x.style.background=t.av;return x})());
     m.appendChild(nameLink(t.who,t.uid));var car=t.uid&&people[t.uid]&&people[t.uid].carLabel||t.car;if(car)m.appendChild(el('span','carchip',car));
-    if(t.role)m.appendChild(el('span','badge','✓ '+t.role));
+    if(t.role||EDITORS[t.uid])m.appendChild(el('span','badge','✓ '+(t.role||'Editor')));
     m.appendChild(el('span','flair '+t.fc,t.kind));
     a.appendChild(m);var h=el('h3');if(t.link){var ln=el('a',null,t.t);ln.href=t.link;ln.style.textDecoration='none';h.appendChild(ln)}else h.textContent=t.t;a.appendChild(h);if(t.ex)a.appendChild(el('p','ex',t.ex));
     if(t.link){var rd=el('a','link','Read the post →');rd.href=t.link;var rp=el('p');rp.style.marginTop='8px';rp.appendChild(rd);a.appendChild(rp)}
@@ -1004,7 +1007,7 @@ function renderFeed(){
   });
 }
 function replyEl(r){var d=el('div','reply');var m=el('div','meta');m.appendChild(avatar(r.name||'?',r.uid));m.appendChild(nameLink(r.name||'Member',r.uid));
-  var car=r.uid&&people[r.uid]&&people[r.uid].carLabel||r.car;if(car)m.appendChild(el('span','carchip',car));m.appendChild(el('span',null,'· '+when(r.created)));
+  if(EDITORS[r.uid])m.appendChild(el('span','badge','✓ Editor'));var car=r.uid&&people[r.uid]&&people[r.uid].carLabel||r.car;if(car)m.appendChild(el('span','carchip',car));m.appendChild(el('span',null,'· '+when(r.created)));
   d.appendChild(m);d.appendChild(el('p',null,r.body));if(r.id){var f=el('div','tfoot');f.appendChild(likeBtn('r_'+r.id,r.uid));d.appendChild(f)}return d}
 async function toggleReplies(t,rz,rb){
   if(!rz.hidden){rz.hidden=true;openThread=null;return}
@@ -1190,7 +1193,7 @@ async function showUser(u){var v=$('userView');var p=people[u];
   if(!p&&db){try{var d=await db.collection('profiles').doc(u).get();if(d.exists){p=people[u]=d.data()}}catch(e){}}
   if(!p){$('uName').textContent='Profile not found';$('uCar').textContent='';$('uBio').textContent='';$('uStats').textContent='';$('uPosts').textContent='';$('uFollow').hidden=true;return}
   var av=$('uAvatar');av.textContent='';av.appendChild(avatar(p.name,u,null,96));
-  $('uName').textContent=p.name;$('uCar').textContent=p.carLabel?'Drives a '+p.carLabel:'';$('uBio').textContent=p.bio||'';
+  $('uName').textContent=p.name+(EDITORS[u]?' ✓':'');$('uCar').textContent=p.carLabel?'Drives a '+p.carLabel:'';$('uBio').textContent=p.bio||'';
   var st=await userStats(u);statBox($('uStats'),[['Posts',st.posts],['Replies',st.replies],['Likes received',st.likes],['Followers',st.followers],['Following',st.following]]);
   var fb=$('uFollow');fb.hidden=(u===uid());var fol=profile.following||[];
   function paint(){var on=(profile.following||[]).indexOf(u)>=0;fb.textContent=on?'Following ✓':'Follow';fb.classList.toggle('ghost',on)}paint();
