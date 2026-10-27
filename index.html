@@ -301,6 +301,7 @@ body.reading main{display:none}
 .authtabs button.on{background:var(--navy);color:#fff}
 .linkbtn{border:0;background:none;color:var(--navy);text-decoration:underline;cursor:pointer;font-weight:600}
 .authbox{margin-top:20px}
+.spamtip{display:inline-block;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;padding:10px 14px;font-size:.95rem}
 .authbox p{margin-top:10px}
 .row2{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 #joinMsg{margin-top:12px;font-weight:600;color:var(--navy);min-height:1.6em}
@@ -613,7 +614,7 @@ footer .refs{line-height:1.7}
     <div id="verifyBox" class="authbox" hidden>
       <p id="verifyText"></p>
       <p class="row2"><button class="btn" type="button" id="iVerified">I clicked the link</button><button class="btn ghost" type="button" id="resend">Send the email again</button></p>
-      <p class="mute" style="font-size:.88rem">Can't find it? Check your spam folder.</p>
+      <p class="spamtip"><b>Check your spam folder!</b> Our email often lands there. If you find it, mark it as "Not spam".</p>
     </div>
     <div id="welcomeBox" class="authbox" hidden>
       <p class="row2"><a class="btn" href="#garage">Go to the Garage</a><button class="btn ghost" type="button" id="logout">Log out</button></p>
