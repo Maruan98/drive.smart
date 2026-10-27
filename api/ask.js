@@ -10,6 +10,42 @@ For anything about brakes failing, steering, smoke, overheating or a fuel smell,
 If the question is not about cars, driving or car costs, say kindly that you only help with cars.
 End with one short line inviting them to post in Ask the Garage so a real person can confirm. Plain text only, no markdown.`;
 
+// Groq changes its model list over time, so we ask Groq which models exist and pick a good chat model.
+// To force one, add a GROQ_MODEL variable in Vercel.
+const PREFERRED = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'];
+let cachedModel = null;
+
+async function pickModel(key, avoid) {
+  if (process.env.GROQ_MODEL) return process.env.GROQ_MODEL;
+  if (cachedModel && cachedModel !== avoid) return cachedModel;
+  try {
+    const r = await fetch('https://api.groq.com/openai/v1/models', { headers: { 'Authorization': 'Bearer ' + key } });
+    const d = await r.json();
+    const ids = (d.data || []).filter(m => m.active !== false).map(m => m.id)
+      .filter(id => id !== avoid && !/whisper|tts|orpheus|guard|allam|prompt|compound|playai/i.test(id));
+    cachedModel = PREFERRED.find(p => ids.includes(p))
+      || ids.find(id => /gpt-oss|llama|qwen|kimi|gemma|mistral/i.test(id))
+      || ids[0] || PREFERRED[0];
+  } catch (e) { cachedModel = PREFERRED[0]; }
+  return cachedModel;
+}
+
+async function chat(key, model, messages) {
+  const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, max_tokens: 500, temperature: 0.5,
+      messages: [{ role: 'system', content: SYSTEM }, ...messages] })
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const msg = (data && data.error && data.error.message) || ('AI error ' + r.status);
+    return { error: msg, modelError: /model/i.test(msg) && (r.status === 404 || r.status === 400) };
+  }
+  const text = ((data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '').trim();
+  return text ? { text } : { error: 'Empty answer' };
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   const key = process.env.GROQ_API_KEY;
@@ -25,16 +61,11 @@ export default async function handler(req, res) {
   if (!messages.length || messages[messages.length - 1].role !== 'user') return res.status(400).json({ error: 'Bad request' });
 
   try {
-    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'llama-3.3-70b-versatile', max_tokens: 400, temperature: 0.5,
-        messages: [{ role: 'system', content: SYSTEM }, ...messages] })
-    });
-    const data = await r.json();
-    if (!r.ok) return res.status(502).json({ error: (data && data.error && data.error.message) || 'AI error' });
-    const text = ((data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '').trim();
-    return res.status(200).json({ text });
+    let model = await pickModel(key);
+    let out = await chat(key, model, messages);
+    if (out.modelError) { cachedModel = null; model = await pickModel(key, model); out = await chat(key, model, messages); }
+    if (out.error) return res.status(502).json({ error: out.error });
+    return res.status(200).json({ text: out.text });
   } catch (e) {
     return res.status(502).json({ error: 'AI unreachable' });
   }
