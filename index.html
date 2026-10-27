@@ -159,6 +159,37 @@ body.reading main{display:none}
 .rbox textarea{min-height:70px;resize:vertical}
 .rbox .nprow .btn{min-height:38px}
 .tfoot button.on{color:var(--navy);font-weight:600}
+.av.img{background:var(--sky);overflow:hidden;padding:0}
+.av img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+a.who{color:var(--ink);font-weight:600;text-decoration:none}
+a.who:hover{color:var(--navy);text-decoration:underline}
+.tfoot .like{font-weight:600}
+.tfoot .like.on{color:var(--navy)}
+.hav{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;background:#fff;color:var(--navy);font-size:.7rem;font-weight:700;overflow:hidden;vertical-align:middle;margin-right:2px}
+.hav img{width:100%;height:100%;object-fit:cover}
+.profgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:24px;align-items:start}
+.profcard{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.bigav{position:relative;width:120px;height:120px;border-radius:50%;cursor:pointer;display:block;margin-bottom:8px}
+#meAvatar{width:120px;height:120px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font:700 2.4rem var(--f-head);overflow:hidden}
+#meAvatar img{width:100%;height:100%;object-fit:cover}
+.camera{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.74rem;font-weight:600;white-space:nowrap}
+.bigav:focus-within,.bigav:hover #meAvatar{outline:3px solid var(--sky)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;margin-top:10px}
+.stat{background:var(--paper);border-radius:10px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-size:1.4rem;color:var(--navy);font-variant-numeric:tabular-nums}
+.stat span{font-size:.76rem;color:var(--mute);line-height:1.2;display:block}
+.profside{display:flex;flex-direction:column;gap:18px}
+.flabel{display:block;font-weight:600;font-size:.9rem;margin:10px 0 6px}
+#bioIn{width:100%;min-height:70px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;background:var(--paper);color:var(--ink);resize:vertical}
+.check{display:flex;gap:8px;align-items:center;font-size:.92rem;margin-bottom:6px}
+#meTabs{margin-bottom:6px;display:inline-flex}
+.melist a.person{display:flex;align-items:center;gap:10px;font-weight:400}
+.melist a.person b{display:block}
+.uhead{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+.uhead #uFollow{margin-left:auto}
+#userView .stat{background:var(--card);border:1px solid var(--line)}
+#userView .stats{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:600px){#userView .stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .megrid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:20px;align-items:start}
 .carpick{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;margin:12px 0}
 .carpick label{font-weight:600;font-size:.9rem}
@@ -374,7 +405,7 @@ footer .refs{line-height:1.7}
   .talkimg{height:260px}
   .video{height:340px}
   .fixphoto{width:100%;height:240px}
-  .fixhead,.about,.megrid{grid-template-columns:minmax(0,1fr);gap:20px}
+  .fixhead,.about,.megrid,.profgrid{grid-template-columns:minmax(0,1fr);gap:20px}
   .teamphoto img{aspect-ratio:1;object-position:50% 30%}
   .costimg{height:200px;min-height:0}
   .acct input,.acct select,.join .acct input{width:100%}
@@ -440,7 +471,7 @@ footer .refs{line-height:1.7}
     <a href="#cost" data-sec="cost">True Cost tool</a>
     <a href="#video" data-sec="video">Videos</a>
     <a href="#about" data-sec="about">About us</a>
-    <a href="#me" data-sec="me" id="meTab" hidden>My Garage</a>
+    <a href="#me" data-sec="me" id="meTab" hidden>My profile</a>
     <a href="#assistant" class="ai-tab">Garage Assistant</a>
   </nav>
 </header>
@@ -479,6 +510,7 @@ footer .refs{line-height:1.7}
     <nav class="side-l" aria-label="Topics">
       <h4>Browse</h4>
       <button class="topic on" data-f="all"><i>★</i>Everything</button>
+      <button class="topic" data-f="following"><i>♥</i>Following</button>
       <h4>Problems &amp; fixes</h4>
       <button class="topic" data-f="fix"><i>🔧</i>Fix Smart</button>
       <div class="sub"><a href="#fix" data-cat="light">Warning lights</a><a href="#fix" data-cat="noise">Noises</a><a href="#fix" data-cat="feel">Feels wrong</a><a href="#fix" data-cat="smell">Smells</a></div>
@@ -496,7 +528,7 @@ footer .refs{line-height:1.7}
         <button class="btn" type="button" data-need="post">Ask a question</button>
       </div>
       <div class="mtabs" role="group" aria-label="Topics">
-        <button class="chip" data-f="all">Everything</button><button class="chip" data-f="fix">Problems &amp; fixes</button><button class="chip" data-f="talk">Car Talk</button><button class="chip" data-f="buy">Buying</button><button class="chip" data-f="global">Global</button>
+        <button class="chip" data-f="all">Everything</button><button class="chip" data-f="following">Following</button><button class="chip" data-f="fix">Problems &amp; fixes</button><button class="chip" data-f="talk">Car Talk</button><button class="chip" data-f="buy">Buying</button><button class="chip" data-f="global">Global</button>
       </div>
       <form id="newPost" class="newpost" hidden>
         <h3>Ask the Garage</h3>
@@ -647,30 +679,33 @@ footer .refs{line-height:1.7}
   </div>
 </section>
 
-<!-- MY GARAGE (members) -->
+<!-- MY PROFILE (members) -->
 <section class="band" id="me" hidden style="background:var(--card)">
-  <div class="wrap">
-    <div class="head"><div><h2 id="meTitle">My Garage</h2><p>Your car, the posts you saved and the questions you asked.</p></div></div>
-    <div class="megrid">
-      <div class="panel mecar">
-        <h3>My car</h3>
-        <p class="mute" id="carNow">No car added yet.</p>
+  <div class="wrap profgrid">
+    <div class="panel profcard">
+      <label class="bigav" for="photoIn" title="Change your photo"><span id="meAvatar"></span><span class="camera">Change photo</span></label>
+      <input id="photoIn" type="file" accept="image/*" hidden>
+      <h2 id="meName"></h2>
+      <p class="mute" id="meCar"></p>
+      <p id="meBio"></p>
+      <div class="stats" id="meStats"></div>
+    </div>
+    <div class="profside">
+      <div class="panel">
+        <h3>Edit my profile</h3>
+        <label class="flabel" for="bioIn">About me</label>
+        <textarea id="bioIn" maxlength="300" placeholder="E.g. Queen's student, first car last year, I love JDM and road trips."></textarea>
         <div class="carpick">
           <label for="carMake">Make</label><select id="carMake"></select>
           <label for="carModel">Model</label><select id="carModel" disabled><option value="">Choose a make first</option></select>
           <label for="carYear">Year</label><select id="carYear"></select>
         </div>
-        <p class="nprow"><button class="btn" type="button" id="carSave">Save my car</button><button class="linkbtn" type="button" id="carNone">I don't have a car yet</button></p>
-        <p class="npmsg" id="carMsg" aria-live="polite"></p>
-        <p class="mute" style="font-size:.86rem">Your car shows next to your name when you post, so people can give better answers.</p>
+        <label class="check"><input type="checkbox" id="noCar"> I don't have a car yet</label>
+        <p class="nprow"><button class="btn" type="button" id="profSave">Save profile</button><span class="npmsg" id="profMsg" aria-live="polite"></span></p>
       </div>
       <div class="panel">
-        <h3>Saved posts</h3>
-        <div class="melist" id="savedList"></div>
-      </div>
-      <div class="panel">
-        <h3>My questions</h3>
-        <div class="melist" id="myList"></div>
+        <div class="sort" id="meTabs" role="group" aria-label="My activity"><button data-t="saved" class="on">Saved</button><button data-t="posts">My posts</button><button data-t="following">Following</button></div>
+        <div class="melist" id="meList"></div>
         <p style="margin-top:12px"><button class="btn ghost" type="button" data-need="post">Ask a question</button></p>
       </div>
     </div>
@@ -705,7 +740,7 @@ footer .refs{line-height:1.7}
       <p class="spamtip"><b>Check your spam folder!</b> Our email often lands there. If you find it, mark it as "Not spam".</p>
     </div>
     <div id="welcomeBox" class="authbox" hidden>
-      <p class="row2"><a class="btn" href="#me">Open My Garage</a><a class="btn ghost" href="#garage">Go to the Garage</a><button class="btn ghost" type="button" id="logout">Log out</button></p>
+      <p class="row2"><a class="btn" href="#me">Open my profile</a><a class="btn ghost" href="#garage">Go to the Garage</a><button class="btn ghost" type="button" id="logout">Log out</button></p>
     </div>
     <p id="joinMsg" aria-live="polite"></p>
   </div>
@@ -713,6 +748,16 @@ footer .refs{line-height:1.7}
 </main>
 
 <div id="posts">
+<article class="post" id="userView" hidden>
+  <div class="wrap pwrap">
+    <a class="back" href="#garage">← Back to the Garage</a>
+    <div class="uhead"><div id="uAvatar"></div><div><h1 id="uName" style="margin:0"></h1><p class="mute" id="uCar"></p></div><button class="btn" type="button" id="uFollow">Follow</button></div>
+    <p id="uBio" class="lede"></p>
+    <div class="stats" id="uStats"></div>
+    <h2>Posts</h2>
+    <div class="melist" id="uPosts"></div>
+  </div>
+</article>
 <article class="post" id="post-cars" hidden>
   <div class="wrap pwrap">
     <a class="back" href="#garage">← Back to the Garage</a>
@@ -787,7 +832,7 @@ function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cl
   window.addEventListener('scroll',upd,{passive:true});upd()})();
 
 /* ---------- POST PAGES (#post-...) ---------- */
-function route(){var h=location.hash.slice(1),p=h.indexOf('post-')===0?document.getElementById(h):null;
+function route(){var h=location.hash.slice(1),p=h.indexOf('post-')===0?document.getElementById(h):(h.indexOf('u-')===0?document.getElementById('userView'):null);if(h.indexOf('u-')===0)setTimeout(function(){showUser(h.slice(2))},0);
   document.querySelectorAll('article.post').forEach(function(a){a.hidden=a!==p});
   document.body.classList.toggle('reading',!!p);
   if(p){window.scrollTo(0,0)}else if(h){var t=document.getElementById(h);if(t)setTimeout(function(){t.scrollIntoView()},0)}}
@@ -812,53 +857,92 @@ var threads=[
  {id:'first-car',f:'talk',kind:'Open discussion',fc:'talk',t:'What was your first car? Tell us the story',ex:'Good or bad, we want to hear it. Create a free account to reply.',who:'Maruan Hdioud',role:'Editor',av:'#24375F'}
 ];
 var filt='all';
-function initials(n){return n.split(/\s/).filter(Boolean).map(function(s){return s[0]}).join('').slice(0,2).toUpperCase()}
+function initials(n){return String(n||'?').split(/\s/).filter(Boolean).map(function(s){return s[0]}).join('').slice(0,2).toUpperCase()}
+/* ---------- shared state ---------- */
+var saved={};try{saved=JSON.parse(lsGet('ds-saved')||'{}')||{}}catch(e){saved={}}
+var openThread=null,localReplies={};
+var profile={car:null,bio:'',photo:'',following:[]};   /* my public profile */
+var people={};          /* uid -> public profile (cache) */
+var likeCount={},myLikes={},likeOwner={};  /* target -> count, target -> true */
+var db=null;
+function uid(){return auth&&auth.currentUser?auth.currentUser.uid:null}
+function ts(){return firebase.firestore.FieldValue.serverTimestamp()}
+function needAccount(text){if(member)return true;showTab('up');$('join').scrollIntoView();$('joinName').focus();$('joinMsg').textContent=text||'Posting needs a free account. It takes 20 seconds.';return false}
+function when(t){if(!t||!t.toDate)return 'just now';var d=t.toDate(),m=Math.round((Date.now()-d)/60000);if(m<1)return 'just now';if(m<60)return m+' min ago';if(m<1440)return Math.round(m/60)+' h ago';return d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}
+/* writes: retry once with a fresh login token (needed right after confirming the email) */
+async function dbWrite(fn){try{return await fn()}catch(e){if(e&&e.code==='permission-denied'&&auth&&auth.currentUser){await auth.currentUser.reload();await auth.currentUser.getIdToken(true);return await fn()}throw e}}
+function errMsg(e){var c=(e&&e.code)||'';
+  if(c==='permission-denied')return 'Not allowed. Make sure your email is confirmed (log out and log in again), and that the Firestore rules are published.';
+  if(c==='not-found'||c==='failed-precondition')return 'The database is not set up yet (Firestore Database in Firebase).';
+  if(c==='unavailable')return 'No connection. Try again in a moment.';
+  return 'Could not save ('+(c||(e&&e.message)||'unknown error')+').'}
+
+/* avatar: photo if the person has one, otherwise initials */
+function avatar(name,u,color,size){var p=u&&people[u];var a=el('span','av');if(size){a.style.width=a.style.height=size+'px';a.style.fontSize=(size/2.6)+'px'}
+  if(p&&p.photo){var im=document.createElement('img');im.src=p.photo;im.alt='';a.appendChild(im);a.classList.add('img')}else{a.textContent=initials(name);a.style.background=color||'#6F8BB8'}return a}
+function nameLink(name,u){if(!u)return el('span',null,name);var a=el('a','who',name);a.href='#u-'+u;return a}
+
+/* likes */
+function likeBtn(target,owner){var b=el('button','like'+(myLikes[target]?' on':''));
+  function paint(){b.textContent='▲ '+(likeCount[target]||0);b.classList.toggle('on',!!myLikes[target]);b.setAttribute('aria-pressed',myLikes[target]?'true':'false')}
+  paint();b.setAttribute('aria-label','Like');
+  b.onclick=async function(){if(!needAccount('Create a free account to like posts.'))return;var on=!myLikes[target];
+    myLikes[target]=on;likeCount[target]=(likeCount[target]||0)+(on?1:-1);if(owner)likeOwner[target]=owner;paint();
+    if(!db||!uid())return;var id=target+'_'+uid();
+    try{if(on)await dbWrite(function(){return db.collection('likes').doc(id).set({target:target,uid:uid(),owner:owner||'',created:ts()})});
+        else await dbWrite(function(){return db.collection('likes').doc(id).delete()})}
+    catch(e){myLikes[target]=!on;likeCount[target]+=on?-1:1;paint();toast(errMsg(e))}};
+  return b}
+async function loadLikes(){if(!db)return;try{var s=await db.collection('likes').limit(2000).get();likeCount={};myLikes={};likeOwner={};
+  s.forEach(function(d){var x=d.data();likeCount[x.target]=(likeCount[x.target]||0)+1;if(x.uid===uid())myLikes[x.target]=true;if(x.owner)likeOwner[x.target]=x.owner});renderFeed()}catch(e){}}
+async function loadPeople(){if(!db)return;try{var s=await db.collection('profiles').limit(500).get();s.forEach(function(d){people[d.id]=d.data()});renderFeed()}catch(e){}}
+
+/* ---------- FEED ---------- */
 function renderFeed(){
-  var list=threads.filter(function(t){return filt==='all'||t.f===filt});
+  var fol=profile.following||[];
+  var list=threads.filter(function(t){if(filt==='all')return true;if(filt==='following')return t.uid&&fol.indexOf(t.uid)>=0;return t.f===filt});
   var feed=$('feed');feed.textContent='';
-  if(!list.length){feed.appendChild(el('div','empty','No posts in this topic yet. We just launched, so ask the first question!'));return}
+  if(!list.length){feed.appendChild(el('div','empty',filt==='following'?(member?'No posts from people you follow yet. Open someone\'s profile and tap Follow.':'Log in and follow people to see their posts here.'):'No posts in this topic yet. We just launched, so ask the first question!'));return}
   list.forEach(function(t){
     var a=el('article','thread');
-    var m=el('div','meta');var av=el('span','av',t.who==='Example'?'?':initials(t.who));av.style.background=t.av;m.appendChild(av);
-    m.appendChild(el('span',null,t.who));if(t.car)m.appendChild(el('span','carchip',t.car));
+    var m=el('div','meta');m.appendChild(t.uid?avatar(t.who,t.uid):(function(){var x=el('span','av',t.who==='Example'?'?':initials(t.who));x.style.background=t.av;return x})());
+    m.appendChild(nameLink(t.who,t.uid));var car=t.uid&&people[t.uid]&&people[t.uid].carLabel||t.car;if(car)m.appendChild(el('span','carchip',car));
     if(t.role)m.appendChild(el('span','badge','✓ '+t.role));
     m.appendChild(el('span','flair '+t.fc,t.kind));
-    a.appendChild(m);var h=el('h3');if(t.link){var ln=el('a',null,t.t);ln.href=t.link;ln.style.textDecoration='none';h.appendChild(ln)}else h.textContent=t.t;a.appendChild(h);a.appendChild(el('p','ex',t.ex));
+    a.appendChild(m);var h=el('h3');if(t.link){var ln=el('a',null,t.t);ln.href=t.link;ln.style.textDecoration='none';h.appendChild(ln)}else h.textContent=t.t;a.appendChild(h);if(t.ex)a.appendChild(el('p','ex',t.ex));
     if(t.link){var rd=el('a','link','Read the post →');rd.href=t.link;var rp=el('p');rp.style.marginTop='8px';rp.appendChild(rd);a.appendChild(rp)}
-    if(t.best){var bb=el('div','best');bb.appendChild(el('b',null,'Editor answer · '+t.best.who));bb.appendChild(document.createElement('br'));bb.appendChild(document.createTextNode(t.best.txt));a.appendChild(bb)}
     var fo=el('div','tfoot');var rz=el('div','replies');rz.hidden=true;
+    fo.appendChild(likeBtn('t_'+t.id,t.uid));
     var rb=el('button',null,'💬 Reply');rb.onclick=function(){toggleReplies(t,rz,rb)};fo.appendChild(rb);
-    var sv=el('button',saved[t.id]?'on':'',saved[t.id]?'Saved':'Save');sv.onclick=function(){if(!needAccount())return;saved[t.id]=!saved[t.id];sv.textContent=saved[t.id]?'Saved':'Save';sv.classList.toggle('on',!!saved[t.id]);saveProfile().catch(function(){});renderMe();toast(saved[t.id]?'Saved to My Garage':'Removed from My Garage')};fo.appendChild(sv);
+    var sv=el('button',saved[t.id]?'on':'',saved[t.id]?'Saved':'Save');sv.onclick=function(){if(!needAccount())return;saved[t.id]=!saved[t.id];sv.textContent=saved[t.id]?'Saved':'Save';sv.classList.toggle('on',!!saved[t.id]);savePrivate().catch(function(){});renderMe();toast(saved[t.id]?'Saved to your profile':'Removed from your profile')};fo.appendChild(sv);
     var sh=el('button',null,'Share');sh.onclick=function(){var url=location.origin+location.pathname+(t.link||'#garage');
       if(navigator.clipboard)navigator.clipboard.writeText(url).then(function(){toast('Link copied')},function(){toast(url)});else toast(url)};fo.appendChild(sh);
-    var fl=el('button',null,'Flag');fl.onclick=function(){if(!needAccount())return;if(db&&uid())dbWrite(function(){return db.collection('flags').add({thread:t.id,uid:uid(),created:firebase.firestore.FieldValue.serverTimestamp()})}).catch(function(){});fl.textContent='Flagged';fl.disabled=true;toast('Thanks, an editor will review this post.')};fo.appendChild(fl);
+    var fl=el('button',null,'Flag');fl.onclick=function(){if(!needAccount())return;if(db&&uid())dbWrite(function(){return db.collection('flags').add({thread:t.id,uid:uid(),created:ts()})}).catch(function(){});fl.textContent='Flagged';fl.disabled=true;toast('Thanks, an editor will review this post.')};fo.appendChild(fl);
     a.appendChild(fo);a.appendChild(rz);feed.appendChild(a);
     if(openThread===t.id)toggleReplies(t,rz,rb);
   });
 }
-var saved={};try{saved=JSON.parse(lsGet('ds-saved')||'{}')||{}}catch(e){saved={}}
-var openThread=null,localReplies={};
-function needAccount(text){if(member)return true;showTab('up');$('join').scrollIntoView();$('joinName').focus();$('joinMsg').textContent=text||'Posting needs a free account. It takes 20 seconds.';return false}
-function when(ts){if(!ts||!ts.toDate)return 'just now';var d=ts.toDate(),m=Math.round((Date.now()-d)/60000);if(m<1)return 'just now';if(m<60)return m+' min ago';if(m<1440)return Math.round(m/60)+' h ago';return d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}
-function replyEl(r){var d=el('div','reply');var m=el('div','meta');var av=el('span','av',initials(r.name||'?'));av.style.background='#6F8BB8';m.appendChild(av);m.appendChild(el('span',null,r.name||'Member'));if(r.car)m.appendChild(el('span','carchip',r.car));m.appendChild(el('span',null,'· '+when(r.created)));d.appendChild(m);d.appendChild(el('p',null,r.body));return d}
+function replyEl(r){var d=el('div','reply');var m=el('div','meta');m.appendChild(avatar(r.name||'?',r.uid));m.appendChild(nameLink(r.name||'Member',r.uid));
+  var car=r.uid&&people[r.uid]&&people[r.uid].carLabel||r.car;if(car)m.appendChild(el('span','carchip',car));m.appendChild(el('span',null,'· '+when(r.created)));
+  d.appendChild(m);d.appendChild(el('p',null,r.body));if(r.id){var f=el('div','tfoot');f.appendChild(likeBtn('r_'+r.id,r.uid));d.appendChild(f)}return d}
 async function toggleReplies(t,rz,rb){
   if(!rz.hidden){rz.hidden=true;openThread=null;return}
   rz.hidden=false;openThread=t.id;rz.textContent='';var list=el('div','replies-list');list.style.display='contents';rz.appendChild(list);
   var loading=el('p','mute','Loading replies...');list.appendChild(loading);
   var items=[];
-  if(db){try{var snap=await db.collection('replies').where('thread','==',t.id).get();snap.forEach(function(d){items.push(d.data())});
+  if(db){try{var snap=await db.collection('replies').where('thread','==',t.id).get();snap.forEach(function(d){items.push(Object.assign({id:d.id},d.data()))});
       items.sort(function(a,b){return ((a.created&&a.created.seconds)||9e9)-((b.created&&b.created.seconds)||9e9)})}catch(e){loading.textContent='Could not load replies.'}}
   else items=(localReplies[t.id]||[]).slice();
   loading.remove();
   if(!items.length)list.appendChild(el('p','mute','No replies yet. Be the first!'));
   items.forEach(function(r){list.appendChild(replyEl(r))});
-  var box=el('form','rbox');
   if(!member){var p=el('p','mute','Create a free account to reply. ');var j=el('a','link','Join the community');j.href='#join';j.onclick=function(){showTab('up')};p.appendChild(j);rz.appendChild(p);return}
+  var box=el('form','rbox');
   var ta=el('textarea');ta.maxLength=2000;ta.placeholder='Write your reply...';ta.setAttribute('aria-label','Your reply');box.appendChild(ta);
   var row=el('div','nprow');var go=el('button','btn','Post reply');go.type='submit';row.appendChild(go);var info=el('span','npmsg');row.appendChild(info);box.appendChild(row);
-  box.onsubmit=async function(e){e.preventDefault();var body=ta.value.trim();if(!body)return;go.disabled=true;
-    var r={thread:t.id,body:body.slice(0,2000),name:member.name,car:carLabel().trim(),uid:auth&&auth.currentUser?auth.currentUser.uid:'demo'};
-    try{if(db){var rr=Object.assign({},r,{created:firebase.firestore.FieldValue.serverTimestamp()});await dbWrite(function(){return db.collection('replies').add(rr)})}
+  box.onsubmit=async function(e){e.preventDefault();var body=ta.value.trim();if(!body)return;go.disabled=true;info.textContent='Posting...';
+    var r={thread:t.id,threadOwner:t.uid||'',body:body.slice(0,2000),name:member.name,car:carLabel(),uid:uid()||'demo'};
+    try{if(db){var ref=await dbWrite(function(){return db.collection('replies').add(Object.assign({},r,{created:ts()}))});r.id=ref.id}
         else{(localReplies[t.id]=localReplies[t.id]||[]).push(r)}
       var empty=list.querySelector('p.mute');if(empty)empty.remove();list.appendChild(replyEl(r));ta.value='';info.textContent=db?'Posted!':'Demo mode: only you can see this.'}
     catch(err){info.textContent=errMsg(err)}
@@ -867,16 +951,25 @@ async function toggleReplies(t,rz,rb){
 }
 function openNewPost(cat){if(!needAccount())return;setFilter('all');$('newPost').hidden=false;if(cat)$('npCat').value=cat;$('garage').scrollIntoView();setTimeout(function(){$('npTitle').focus()},300)}
 $('npCancel').onclick=function(){$('newPost').hidden=true;$('npMsg').textContent=''};
+var KINDS={fix:'Question',buy:'Buying',talk:'Car Talk',global:'Global Garage'};
 $('newPost').addEventListener('submit',async function(e){e.preventDefault();var ti=$('npTitle').value.trim(),bo=$('npBody').value.trim();
   if(ti.length<8)return $('npMsg').textContent='Write your question in one clear line (at least 8 characters).';
-  var cat=$('npCat').value,kinds={fix:'Question',buy:'Buying',talk:'Car Talk',global:'Global Garage'};
-  var t={f:cat,kind:kinds[cat],fc:cat==='talk'?'talk':'',t:ti.slice(0,140),ex:bo.slice(0,2000),who:member.name,car:carLabel().trim(),uid:uid(),role:'',av:'#6F8BB8'};
+  var cat=$('npCat').value;
+  var t={f:cat,kind:KINDS[cat],fc:cat==='talk'?'talk':'',t:ti.slice(0,140),ex:bo.slice(0,2000),who:member.name,car:carLabel(),uid:uid(),role:'',av:'#6F8BB8'};
   $('npMsg').textContent='Posting...';
-  try{if(db){var ref=await dbWrite(function(){return db.collection('threads').add({title:t.t,body:t.ex,cat:cat,name:member.name,car:t.car,uid:auth.currentUser.uid,created:firebase.firestore.FieldValue.serverTimestamp()})});t.id=ref.id}
+  try{if(db){var ref=await dbWrite(function(){return db.collection('threads').add({title:t.t,body:t.ex,cat:cat,name:member.name,car:t.car,uid:uid(),created:ts()})});t.id=ref.id}
       else{t.id='local-'+Date.now()}
     threads.unshift(t);$('npTitle').value='';$('npBody').value='';$('newPost').hidden=true;$('npMsg').textContent='';renderFeed();renderMe();toast(db?'Your question is live!':'Demo mode: only you can see this.')}
   catch(err){$('npMsg').textContent=errMsg(err)}});
-/* ---------- MY GARAGE ---------- */
+var STATIC_THREADS=null;
+async function loadThreads(){if(!db)return;if(!STATIC_THREADS)STATIC_THREADS=threads.slice();
+  try{var snap=await db.collection('threads').orderBy('created','desc').limit(100).get();var dyn=[];
+    snap.forEach(function(d){var x=d.data();
+      dyn.push({id:d.id,f:x.cat,kind:KINDS[x.cat]||'Question',fc:x.cat==='talk'?'talk':'',t:x.title,ex:x.body||'',who:x.name||'Member',car:x.car||'',uid:x.uid,role:'',av:'#6F8BB8'})});
+    threads=dyn.concat(STATIC_THREADS);renderFeed();renderMe()}catch(e){}}
+function loadCommunity(){loadThreads();loadPeople();loadLikes()}
+
+/* ---------- PROFILE ---------- */
 var CARS={
  'Toyota':['Corolla','Corolla Cross','Camry','Yaris','Prius','RAV4','C-HR','Highlander','Sienna','Tacoma','Matrix','GR86'],
  'Honda':['Civic','Accord','Fit','HR-V','CR-V','Pilot','Odyssey','Insight'],
@@ -898,7 +991,6 @@ var CARS={
  'Tesla':['Model 3','Model Y'],
  'Other':['Other']
 };
-var profile={car:null};
 (function(){var mk=$('carMake'),yr=$('carYear');
   mk.appendChild(new Option('Choose a make',''));Object.keys(CARS).forEach(function(k){mk.appendChild(new Option(k,k))});
   yr.appendChild(new Option('Year',''));for(var y=2026;y>=1990;y--)yr.appendChild(new Option(String(y),String(y)));
@@ -906,41 +998,69 @@ var profile={car:null};
     if(!mk.value){md.disabled=true;md.appendChild(new Option('Choose a make first',''));return}
     md.disabled=false;md.appendChild(new Option('Choose a model',''));CARS[mk.value].forEach(function(m){md.appendChild(new Option(m,m))})};
 })();
-function carLabel(){var c=profile.car;return c?(c.year?c.year+' ':'')+(c.make==='Other'?'':c.make+' ')+(c.model==='Other'?'':c.model):''}
-function showCar(){$('carNow').textContent=profile.car?'You drive a '+carLabel().trim()+'.':(profile.noCar?'No car yet. Our buying guide is made for you!':'No car added yet.');
-  if(profile.car){$('carMake').value=profile.car.make;$('carMake').onchange();$('carModel').value=profile.car.model;$('carYear').value=profile.car.year||''}}
-function uid(){return auth&&auth.currentUser?auth.currentUser.uid:null}
-async function saveProfile(){lsSet('ds-profile',JSON.stringify(profile));lsSet('ds-saved',JSON.stringify(saved));
-  if(db&&uid()){await dbWrite(function(){return db.collection('users').doc(uid()).set({car:profile.car||null,noCar:!!profile.noCar,saved:Object.keys(saved).filter(function(k){return saved[k]})},{merge:true})})}}
-async function loadProfile(){profile={car:null};
-  try{profile=JSON.parse(lsGet('ds-profile')||'null')||{car:null}}catch(e){}
-  if(db&&uid()){try{var d=await db.collection('users').doc(uid()).get();if(d.exists){var x=d.data();profile.car=x.car||null;profile.noCar=!!x.noCar;saved={};(x.saved||[]).forEach(function(k){saved[k]=true})}}catch(e){}}
-  showCar();renderMe();renderFeed()}
-$('carSave').onclick=async function(){var mk=$('carMake').value,md=$('carModel').value,yr=$('carYear').value;
-  if(!mk||!md){$('carMsg').textContent='Choose a make and a model.';return}
-  profile.car={make:mk,model:md,year:yr};profile.noCar=false;$('carMsg').textContent='Saving...';
-  try{await saveProfile();$('carMsg').textContent='Saved!';showCar()}catch(e){$('carMsg').textContent=errMsg(e)}};
-$('carNone').onclick=async function(){profile.car=null;profile.noCar=true;try{await saveProfile();$('carMsg').textContent='Saved!';showCar()}catch(e){$('carMsg').textContent=errMsg(e)}};
+function carText(c){return c?((c.year?c.year+' ':'')+(c.make==='Other'?'':c.make+' ')+(c.model==='Other'?'':c.model)).trim():''}
+function carLabel(){return carText(profile.car)}
+function fillEditor(){var c=profile.car;$('carMake').value=c?c.make:'';$('carMake').onchange();if(c){$('carModel').value=c.model;$('carYear').value=c.year||''}else $('carYear').value='';
+  $('bioIn').value=profile.bio||'';paintMyAvatar()}
+function paintMyAvatar(){var b=$('meAvatar');b.textContent='';if(profile.photo){var im=document.createElement('img');im.src=profile.photo;im.alt='Your profile photo';b.appendChild(im)}else b.appendChild(el('span',null,initials(member?member.name:'?')));
+  var hb=$('signUp');if(member){hb.textContent='';var s=el('span','hav');if(profile.photo){var i2=document.createElement('img');i2.src=profile.photo;i2.alt='';s.appendChild(i2)}else s.textContent=initials(member.name);hb.appendChild(s);hb.appendChild(document.createTextNode(' '+member.name))}}
+function publicData(){return {name:member.name,bio:(profile.bio||'').slice(0,300),photo:profile.photo||'',car:profile.car||null,carLabel:carLabel(),noCar:!!profile.noCar,following:(profile.following||[]).slice(0,500)}}
+async function savePublic(){lsSet('ds-profile',JSON.stringify(profile));if(db&&uid()){var d=publicData();people[uid()]=d;await dbWrite(function(){return db.collection('profiles').doc(uid()).set(d,{merge:true})})}}
+async function savePrivate(){lsSet('ds-saved',JSON.stringify(saved));if(db&&uid()){await dbWrite(function(){return db.collection('users').doc(uid()).set({saved:Object.keys(saved).filter(function(k){return saved[k]})},{merge:true})})}}
+async function loadProfile(){profile={car:null,bio:'',photo:'',following:[]};
+  try{var lp=JSON.parse(lsGet('ds-profile')||'null');if(lp&&!db)profile=Object.assign(profile,lp)}catch(e){}
+  if(db&&uid()){try{var d=await db.collection('profiles').doc(uid()).get();if(d.exists)profile=Object.assign(profile,d.data());
+      var u=await db.collection('users').doc(uid()).get();if(u.exists){saved={};(u.data().saved||[]).forEach(function(k){saved[k]=true})}
+      if(!d.exists)savePublic().catch(function(){})}catch(e){}}
+  fillEditor();renderMe();renderFeed()}
+$('photoIn').onchange=function(){var f=this.files&&this.files[0];if(!f)return;if(!/^image\//.test(f.type)){$('profMsg').textContent='Choose an image file.';return}
+  var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var S=160,c=document.createElement('canvas');c.width=c.height=S;var g=c.getContext('2d');
+      var s=Math.min(img.width,img.height);g.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,S,S);
+      profile.photo=c.toDataURL('image/jpeg',0.82);paintMyAvatar();$('profMsg').textContent='Saving photo...';
+      savePublic().then(function(){$('profMsg').textContent='Photo saved!';renderFeed()},function(e){$('profMsg').textContent=errMsg(e)})};img.src=rd.result};rd.readAsDataURL(f)};
+$('profSave').onclick=async function(){var mk=$('carMake').value,md=$('carModel').value,yr=$('carYear').value;
+  if(mk&&!md){$('profMsg').textContent='Choose a model for your car.';return}
+  profile.car=mk?{make:mk,model:md,year:yr}:null;profile.noCar=$('noCar').checked;if(profile.noCar)profile.car=null;
+  profile.bio=$('bioIn').value.trim().slice(0,300);$('profMsg').textContent='Saving...';
+  try{await savePublic();$('profMsg').textContent='Profile saved!';renderMe();renderFeed()}catch(e){$('profMsg').textContent=errMsg(e)}};
 function threadLink(t){var a=el('a',null,t.t);a.appendChild(el('span',null,t.kind+' · '+t.who));a.href='#garage';
-  a.onclick=function(e){e.preventDefault();openThread=t.id;setFilter('all');$('garage').scrollIntoView()};return a}
-async function renderMe(){if(!member)return;$('meTitle').textContent=member.name+"'s Garage";
-  var sl=$('savedList');sl.textContent='';var sv=threads.filter(function(t){return saved[t.id]});
-  if(!sv.length)sl.appendChild(el('p','mute','Nothing saved yet. Tap "Save" under a post to keep it here.'));sv.forEach(function(t){sl.appendChild(threadLink(t))});
-  var ml=$('myList');ml.textContent='';var mine=threads.filter(function(t){return t.uid&&t.uid===uid()});
-  if(!mine.length)ml.appendChild(el('p','mute','You haven\'t asked anything yet.'));mine.forEach(function(t){ml.appendChild(threadLink(t))})}
-/* writes: retry once with a fresh login token (needed right after confirming the email) */
-async function dbWrite(fn){try{return await fn()}catch(e){if(e&&e.code==='permission-denied'&&auth&&auth.currentUser){await auth.currentUser.reload();await auth.currentUser.getIdToken(true);return await fn()}throw e}}
-function errMsg(e){var c=(e&&e.code)||'';
-  if(c==='permission-denied')return 'Not allowed. Make sure your email is confirmed (log out and log in again), and that the Firestore rules are published.';
-  if(c==='not-found'||c==='failed-precondition')return 'The database is not set up yet (Firestore Database in Firebase).';
-  if(c==='unavailable')return 'No connection. Try again in a moment.';
-  return 'Could not save ('+(c||(e&&e.message)||'unknown error')+').'}
-var STATIC_THREADS=null;
-async function loadThreads(){if(!db)return;if(!STATIC_THREADS)STATIC_THREADS=threads.slice();
-  try{var snap=await db.collection('threads').orderBy('created','desc').limit(50).get();var dyn=[];
-    snap.forEach(function(d){var x=d.data(),kinds={fix:'Question',buy:'Buying',talk:'Car Talk',global:'Global Garage'};
-      dyn.push({id:d.id,f:x.cat,kind:kinds[x.cat]||'Question',fc:x.cat==='talk'?'talk':'',t:x.title,ex:x.body||'',who:x.name||'Member',car:x.car||'',uid:x.uid,role:'',av:'#6F8BB8'})});
-    threads=dyn.concat(STATIC_THREADS);renderFeed();renderMe()}catch(e){}}
+  a.onclick=function(e){e.preventDefault();openThread=t.id;setFilter('all');location.hash='#garage';setTimeout(function(){$('garage').scrollIntoView()},50)};return a}
+function statBox(box,pairs){box.textContent='';pairs.forEach(function(p){var d=el('div','stat');d.appendChild(el('b',null,String(p[1])));d.appendChild(el('span',null,p[0]));box.appendChild(d)})}
+async function userStats(u){var st={posts:0,replies:0,likes:0,followers:0,following:0,repliesToMe:0};
+  st.posts=threads.filter(function(t){return t.uid===u}).length;
+  Object.keys(likeOwner).forEach(function(k){if(likeOwner[k]===u)st.likes+=likeCount[k]||0});
+  var p=people[u]||(u===uid()?profile:null);st.following=p&&p.following?p.following.length:0;
+  Object.keys(people).forEach(function(k){if((people[k].following||[]).indexOf(u)>=0)st.followers++});
+  if(db){try{var r=await db.collection('replies').where('uid','==',u).get();st.replies=r.size;
+      var r2=await db.collection('replies').where('threadOwner','==',u).get();st.repliesToMe=r2.size}catch(e){}}
+  return st}
+var meTabNow='saved';
+async function renderMe(){if(!member)return;$('meName').textContent=member.name;$('meCar').textContent=carLabel()?'Drives a '+carLabel():(profile.noCar?'No car yet':'');$('meBio').textContent=profile.bio||'Add a short bio so people know who you are.';
+  paintMyAvatar();
+  var st=await userStats(uid());statBox($('meStats'),[['Posts',st.posts],['Replies',st.replies],['Likes received',st.likes],['Replies to your posts',st.repliesToMe],['Followers',st.followers],['Following',st.following]]);
+  drawMeTab()}
+function drawMeTab(){document.querySelectorAll('#meTabs button').forEach(function(b){b.classList.toggle('on',b.dataset.t===meTabNow)});
+  var box=$('meList');box.textContent='';var items=[];
+  if(meTabNow==='saved'){items=threads.filter(function(t){return saved[t.id]});if(!items.length)box.appendChild(el('p','mute','Nothing saved yet. Tap "Save" under a post to keep it here.'))}
+  if(meTabNow==='posts'){items=threads.filter(function(t){return t.uid&&t.uid===uid()});if(!items.length)box.appendChild(el('p','mute','You haven\'t posted anything yet.'))}
+  if(meTabNow==='following'){var f=profile.following||[];if(!f.length)box.appendChild(el('p','mute','You don\'t follow anyone yet. Tap a name in the Garage to see their profile.'));
+    f.forEach(function(u){var p=people[u]||{name:'Member'};var a=el('a','person');a.href='#u-'+u;a.appendChild(avatar(p.name,u,null,36));var t=el('div');t.appendChild(el('b',null,p.name));if(p.carLabel)t.appendChild(el('span',null,p.carLabel));a.appendChild(t);box.appendChild(a)});return}
+  items.forEach(function(t){box.appendChild(threadLink(t))})}
+document.querySelectorAll('#meTabs button').forEach(function(b){b.onclick=function(){meTabNow=b.dataset.t;drawMeTab()}});
+
+/* public profile page (#u-<id>) */
+async function showUser(u){var v=$('userView');var p=people[u];
+  if(!p&&db){try{var d=await db.collection('profiles').doc(u).get();if(d.exists){p=people[u]=d.data()}}catch(e){}}
+  if(!p){$('uName').textContent='Profile not found';$('uCar').textContent='';$('uBio').textContent='';$('uStats').textContent='';$('uPosts').textContent='';$('uFollow').hidden=true;return}
+  var av=$('uAvatar');av.textContent='';av.appendChild(avatar(p.name,u,null,96));
+  $('uName').textContent=p.name;$('uCar').textContent=p.carLabel?'Drives a '+p.carLabel:'';$('uBio').textContent=p.bio||'';
+  var st=await userStats(u);statBox($('uStats'),[['Posts',st.posts],['Replies',st.replies],['Likes received',st.likes],['Followers',st.followers],['Following',st.following]]);
+  var fb=$('uFollow');fb.hidden=(u===uid());var fol=profile.following||[];
+  function paint(){var on=(profile.following||[]).indexOf(u)>=0;fb.textContent=on?'Following ✓':'Follow';fb.classList.toggle('ghost',on)}paint();
+  fb.onclick=async function(){if(!needAccount('Create a free account to follow people.'))return;var f=(profile.following||[]).slice(),i=f.indexOf(u);if(i>=0)f.splice(i,1);else f.push(u);profile.following=f;paint();
+    try{await savePublic();showUser(u)}catch(e){toast(errMsg(e))}};
+  var pl=$('uPosts');pl.textContent='';var mine=threads.filter(function(t){return t.uid===u});if(!mine.length)pl.appendChild(el('p','mute','No posts yet.'));mine.forEach(function(t){pl.appendChild(threadLink(t))})}
+
 function setFilter(f){filt=f;document.querySelectorAll('[data-f]').forEach(function(x){if(x.classList.contains('topic')||x.closest('.mtabs'))x.classList.toggle('on',x.dataset.f===f)});renderFeed()}
 document.querySelectorAll('.topic,.mtabs button').forEach(function(b){b.onclick=function(){setFilter(b.dataset.f)}});
 document.querySelectorAll('a[data-f],button[data-go]').forEach(function(a){a.addEventListener('click',function(e){setFilter(a.dataset.f);if(a.dataset.go){e.preventDefault();$('garage').scrollIntoView()}})});
@@ -948,7 +1068,6 @@ document.querySelectorAll('a[data-f],button[data-go]').forEach(function(a){a.add
 function wireNeed(root){(root||document).querySelectorAll('[data-need]').forEach(function(b){b.onclick=function(){
   if(b.dataset.need==='story'){if(!needAccount())return;openThread='brake-squeal';setFilter('all');location.hash='#garage';return}
   openNewPost(b.dataset.cat)}})}
-var db=null;
 renderFeed();wireNeed(document);
 
 /* ---------- POLL ---------- */
@@ -1029,10 +1148,10 @@ function showVerify(email){$('joinForm').hidden=true;$('loginForm').hidden=true;
   $('verifyText').textContent='Almost done! We sent a link to '+email+'. Click it to confirm your email, then come back here.'}
 function applyMember(){
   var on=!!member;
-  $('welcomeBox').hidden=!on;$('me').hidden=!on;$('meTab').hidden=!on;if(on){showCar();renderMe()}
+  $('welcomeBox').hidden=!on;$('me').hidden=!on;$('meTab').hidden=!on;if(on){fillEditor();renderMe()}
   if(on){$('joinTitle').textContent='Welcome to the Garage, '+member.name+'!';
     $('joinText').textContent=member.type==='enthusiast'?'Thanks for applying as a Verified Enthusiast. We will send you a short car-knowledge check by email. Until then you can post and reply as a member.':'You can now post questions, reply and vote in the Garage.';
-    $('authTabs').hidden=true;$('joinForm').hidden=true;$('loginForm').hidden=true;$('verifyBox').hidden=true;$('signUp').textContent='Hi '+member.name;$('signUp').href='#me';$('signIn').textContent='Log out'}
+    $('authTabs').hidden=true;$('joinForm').hidden=true;$('loginForm').hidden=true;$('verifyBox').hidden=true;$('signUp').href='#me';paintMyAvatar();$('signIn').textContent='Log out'}
   else{$('joinTitle').textContent='Join the community';$('signUp').textContent='Join the community';$('signUp').href='#join';$('signIn').textContent='Log in'}
   $('aiStatus').textContent='Free for everyone, no account needed. Ask anything about your car.'
 }
@@ -1081,8 +1200,8 @@ function userToMember(u){return {name:(u.displayName||u.email.split('@')[0]).sli
   try{await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
       firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();
-      try{await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');db=firebase.firestore();loadThreads()}catch(x){db=null}
-      auth.onAuthStateChanged(function(u){member=u&&u.emailVerified?userToMember(u):null;applyMember();if(member)loadProfile();else renderFeed()});
+      try{await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');db=firebase.firestore();loadCommunity()}catch(x){db=null}
+      auth.onAuthStateChanged(function(u){member=u&&u.emailVerified?userToMember(u):null;applyMember();if(member){loadProfile();loadLikes()}else{profile={car:null,bio:'',photo:'',following:[]};myLikes={};renderFeed()}});
   }catch(e){auth=null}
 })();
 $('joinForm').addEventListener('submit',async function(e){e.preventDefault();var n=$('joinName').value.trim(),em=$('joinEmail').value.trim(),pw=$('joinPass').value;
@@ -1110,7 +1229,7 @@ $('resend').onclick=async function(){if(!auth||!auth.currentUser)return;try{awai
 $('forgot').onclick=async function(){var em=$('logEmail').value.trim();if(!em)return msg('Type your email above first.');
   if(!auth)return msg('Demo mode: password reset is not available here.');
   try{await auth.sendPasswordResetEmail(em);msg('If an account exists, we sent you a link to reset your password.')}catch(err){msg(errText(err))}};
-function logout(){member=null;if(auth)auth.signOut();else saveMember();showTab('up');applyMember();renderFeed()}
+function logout(){member=null;profile={car:null,bio:'',photo:'',following:[]};myLikes={};if(auth)auth.signOut();else saveMember();showTab('up');applyMember();renderFeed()}
 $('logout').onclick=logout;
 $('signIn').addEventListener('click',function(e){if(member){e.preventDefault();logout()}else{showTab('in')}});
 $('signUp').addEventListener('click',function(){if(!member)showTab('up')});
