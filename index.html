@@ -206,6 +206,10 @@ a.who:hover{color:var(--navy);text-decoration:underline}
 #meAvatar img{width:100%;height:100%;object-fit:cover}
 .camera{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.74rem;font-weight:600;white-space:nowrap}
 .bigav:focus-within,.bigav:hover #meAvatar{outline:3px solid var(--sky)}
+.enth{width:100%;background:var(--paper);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;text-align:left;font-size:.85rem;color:var(--mute)}
+.enth b{color:var(--navy);font-size:.92rem}
+.ebar{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.ebar i{display:block;height:100%;background:var(--navy)}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;margin-top:10px}
 .stat{background:var(--paper);border-radius:10px;padding:10px 6px;text-align:center}
 .stat b{display:block;font-size:1.4rem;color:var(--navy);font-variant-numeric:tabular-nums}
@@ -714,7 +718,7 @@ footer .refs{line-height:1.7}
       <h2>Two students who love cars</h2>
       <p class="big">We are Maruan and Cesar, two Queen's students who love cars. We started Drive Smart because not everyone has a "car friend". In surveys, 70% of first-time buyers didn't really know what they were looking for, and 65% of Gen Z think they paid for a repair they didn't need. We want to fix that, in simple words.</p>
       <p>Drive Smart is run by Maruan Hdioud and Cesar Breitner. Cesar writes the buying guides and films our videos. Maruan builds the site and writes the Fix Smart articles. Every post is reviewed by both of us before it goes live.</p>
-      <p><b>How we keep advice reliable:</b> anyone can read, members post with a free account, enthusiasts get a Verified badge after a short car-knowledge check, and we review what gets published.</p>
+      <p><b>How we keep advice reliable:</b> anyone can read, members post with a free account, enthusiasts earn a Verified badge after our editors review their answers in the Garage, and we review what gets published.</p>
       <div class="aff"><span>Queen's University · Smith School of Business</span><span>COMM 339 · Section 1</span><span>Kingston, Ontario</span></div>
     </div>
   </div>
@@ -738,6 +742,7 @@ footer .refs{line-height:1.7}
       <h2 id="meName"></h2>
       <p class="mute" id="meCar"></p>
       <p id="meBio"></p>
+      <div class="enth" id="meEnth" hidden></div>
       <div class="stats" id="meStats"></div>
       <button class="linkbtn" type="button" id="meLogout" style="margin-top:10px">Log out</button>
     </div>
@@ -932,6 +937,9 @@ function saveMember(){lsSet('ds-member',member?JSON.stringify(member):null)}
 /* editors: their posts and replies get the Editor badge */
 var EDITOR_MARUAN='HwRn0NLKuoccFgKcmeaKIg9OwTr2';
 var EDITOR_CESAR='jYyDpN3UnUabFcbgz2Ck9vjgSfr1';
+/* Verified Enthusiasts: badge given by the editors (add their uid here) */
+var VERIFIED={};
+var BADGE_GOAL=10;
 var EDITORS={};EDITORS[EDITOR_MARUAN]=true;EDITORS[EDITOR_CESAR]=true;
 var threads=[
  {id:'top2-cars',uid:EDITOR_CESAR,f:'buy',kind:'Buying guide',fc:'',t:'Our top 2 first cars under $10k',ex:'Corolla or Civic? The years to look for, what to check before buying, and the fair price so you don\'t overpay.',who:'Cesar',role:'Editor',av:'#7A5A2E',link:'#post-cars'},
@@ -992,7 +1000,7 @@ function renderFeed(){
     var a=el('article','thread');
     var m=el('div','meta');m.appendChild(t.uid?avatar(t.uid&&people[t.uid]&&people[t.uid].name||t.who,t.uid):(function(){var x=el('span','av',t.who==='Example'?'?':initials(t.who));x.style.background=t.av;return x})());
     var who=t.uid&&people[t.uid]&&people[t.uid].name||t.who;m.appendChild(nameLink(who,t.uid));var car=t.uid&&people[t.uid]&&people[t.uid].carLabel||t.car;if(car)m.appendChild(el('span','carchip',car));
-    if(t.role||EDITORS[t.uid])m.appendChild(el('span','badge','✓ '+(t.role||'Editor')));
+    if(t.role||EDITORS[t.uid])m.appendChild(el('span','badge','✓ '+(t.role||'Editor')));else if(VERIFIED[t.uid])m.appendChild(el('span','badge','✓ Verified Enthusiast'));
     m.appendChild(el('span','flair '+t.fc,t.kind));
     a.appendChild(m);var h=el('h3');if(t.link){var ln=el('a',null,t.t);ln.href=t.link;ln.style.textDecoration='none';h.appendChild(ln)}else h.textContent=t.t;a.appendChild(h);if(t.ex)a.appendChild(el('p','ex',t.ex));
     if(t.link){var rd=el('a','link','Read the post →');rd.href=t.link;var rp=el('p');rp.style.marginTop='8px';rp.appendChild(rd);a.appendChild(rp)}
@@ -1009,7 +1017,7 @@ function renderFeed(){
   });
 }
 function replyEl(r){var d=el('div','reply');var m=el('div','meta');m.appendChild(avatar(r.name||'?',r.uid));m.appendChild(nameLink(r.name||'Member',r.uid));
-  if(EDITORS[r.uid])m.appendChild(el('span','badge','✓ Editor'));var car=r.uid&&people[r.uid]&&people[r.uid].carLabel||r.car;if(car)m.appendChild(el('span','carchip',car));m.appendChild(el('span',null,'· '+when(r.created)));
+  if(EDITORS[r.uid])m.appendChild(el('span','badge','✓ Editor'));else if(VERIFIED[r.uid])m.appendChild(el('span','badge','✓ Verified Enthusiast'));var car=r.uid&&people[r.uid]&&people[r.uid].carLabel||r.car;if(car)m.appendChild(el('span','carchip',car));m.appendChild(el('span',null,'· '+when(r.created)));
   d.appendChild(m);d.appendChild(el('p',null,r.body));if(r.id){var f=el('div','tfoot');f.appendChild(likeBtn('r_'+r.id,r.uid));d.appendChild(f)}return d}
 async function toggleReplies(t,rz,rb){
   if(!rz.hidden){rz.hidden=true;openThread=null;return}
@@ -1129,7 +1137,7 @@ function fillEditor(){var c=profile.car;var known=c&&CARS[c.make];
   $('bioIn').value=profile.bio||'';paintMyAvatar()}
 function paintMyAvatar(){var b=$('meAvatar');b.textContent='';if(profile.photo){var im=document.createElement('img');im.src=profile.photo;im.alt='Your profile photo';b.appendChild(im)}else b.appendChild(el('span',null,initials(member?member.name:'?')));
   var hb=$('signUp');if(member){hb.textContent='';var s=el('span','hav');if(profile.photo){var i2=document.createElement('img');i2.src=profile.photo;i2.alt='';s.appendChild(i2)}else s.textContent=initials(member.name);hb.appendChild(s);hb.appendChild(document.createTextNode(' '+member.name))}}
-function publicData(){return {name:member.name,bio:(profile.bio||'').slice(0,300),photo:profile.photo||'',car:profile.car||null,carLabel:carLabel(),noCar:!!profile.noCar,following:(profile.following||[]).slice(0,500)}}
+function publicData(){return {applicant:member.type==='enthusiast',name:member.name,bio:(profile.bio||'').slice(0,300),photo:profile.photo||'',car:profile.car||null,carLabel:carLabel(),noCar:!!profile.noCar,following:(profile.following||[]).slice(0,500)}}
 async function savePublic(){lsSet('ds-profile',JSON.stringify(profile));if(db&&uid()){var d=publicData();people[uid()]=d;await dbWrite(function(){return db.collection('profiles').doc(uid()).set(d,{merge:true})})}}
 async function savePrivate(){lsSet('ds-saved',JSON.stringify(saved));if(db&&uid()){await dbWrite(function(){return db.collection('users').doc(uid()).set({saved:Object.keys(saved).filter(function(k){return saved[k]})},{merge:true})})}}
 async function loadProfile(){profile={car:null,bio:'',photo:'',following:[]};
@@ -1167,10 +1175,16 @@ $('profSave').onclick=async function(){var c=readCar();
   try{await savePublic();$('profMsg').textContent='Profile saved!';renderMe();renderFeed()}catch(e){$('profMsg').textContent=errMsg(e)}};
 function threadLink(t){var a=el('a',null,t.t);a.appendChild(el('span',null,t.kind+' · '+(t.uid&&people[t.uid]&&people[t.uid].name||t.who)));a.href='#garage';
   a.onclick=function(e){e.preventDefault();openThread=t.id;setFilter('all');location.hash='#garage';setTimeout(function(){$('garage').scrollIntoView()},50)};return a}
+function enthStatus(box,u,n,applicant){box.textContent='';box.hidden=true;
+  if(EDITORS[u])return;
+  if(VERIFIED[u]){box.hidden=false;box.appendChild(el('b',null,'✓ Verified Enthusiast'));return}
+  if(!applicant)return;box.hidden=false;
+  box.appendChild(el('b',null,'Enthusiast applicant'));
+  box.appendChild(el('span',null,'Keep answering questions in the Garage. Our editors regularly review the most helpful members and give them the Verified badge.'))}
 function statBox(box,pairs){box.textContent='';pairs.forEach(function(p){var d=el('div','stat');d.appendChild(el('b',null,String(p[1])));d.appendChild(el('span',null,p[0]));box.appendChild(d)})}
 async function userStats(u){var st={posts:0,replies:0,likes:0,followers:0,following:0,repliesToMe:0};
   st.posts=threads.filter(function(t){return t.uid===u}).length;
-  Object.keys(likeOwner).forEach(function(k){if(likeOwner[k]===u)st.likes+=likeCount[k]||0});
+  st.replyLikes=0;Object.keys(likeOwner).forEach(function(k){if(likeOwner[k]===u){st.likes+=likeCount[k]||0;if(k.indexOf('r_')===0)st.replyLikes+=likeCount[k]||0}});
   var p=people[u]||(u===uid()?profile:null);st.following=p&&p.following?p.following.length:0;
   Object.keys(people).forEach(function(k){if((people[k].following||[]).indexOf(u)>=0)st.followers++});
   if(db){try{var r=await db.collection('replies').where('uid','==',u).get();st.replies=r.size;
@@ -1179,7 +1193,7 @@ async function userStats(u){var st={posts:0,replies:0,likes:0,followers:0,follow
 var meTabNow='saved';
 async function renderMe(){if(!member)return;$('meName').textContent=member.name;$('meCar').textContent=carLabel()?'Drives a '+carLabel():(profile.noCar?'No car yet':'');$('meBio').textContent=profile.bio||'Add a short bio so people know who you are.';
   paintMyAvatar();
-  var st=await userStats(uid());statBox($('meStats'),[['Posts',st.posts],['Replies',st.replies],['Likes received',st.likes],['Replies to your posts',st.repliesToMe],['Followers',st.followers],['Following',st.following]]);
+  var st=await userStats(uid());enthStatus($('meEnth'),uid(),st.replyLikes,member.type==='enthusiast');statBox($('meStats'),[['Posts',st.posts],['Replies',st.replies],['Likes received',st.likes],['Replies to your posts',st.repliesToMe],['Followers',st.followers],['Following',st.following]]);
   drawMeTab()}
 function drawMeTab(){document.querySelectorAll('#meTabs button').forEach(function(b){b.classList.toggle('on',b.dataset.t===meTabNow)});
   var box=$('meList');box.textContent='';var items=[];
@@ -1196,7 +1210,7 @@ async function showUser(u){var v=$('userView');var p=people[u];
   if(!p){$('uName').textContent='Profile not found';$('uCar').textContent='';$('uBio').textContent='';$('uStats').textContent='';$('uPosts').textContent='';$('uFollow').hidden=true;return}
   var av=$('uAvatar');av.textContent='';av.appendChild(avatar(p.name,u,null,96));
   $('uName').textContent=p.name+(EDITORS[u]?' ✓':'');$('uCar').textContent=p.carLabel?'Drives a '+p.carLabel:'';$('uBio').textContent=p.bio||'';
-  var st=await userStats(u);statBox($('uStats'),[['Posts',st.posts],['Replies',st.replies],['Likes received',st.likes],['Followers',st.followers],['Following',st.following]]);
+  var st=await userStats(u);$('uCar').textContent=(p.carLabel?'Drives a '+p.carLabel:'')+(VERIFIED[u]?' · ✓ Verified Enthusiast':(p.applicant&&!EDITORS[u]?' · Enthusiast applicant':''));statBox($('uStats'),[['Posts',st.posts],['Replies',st.replies],['Likes received',st.likes],['Followers',st.followers],['Following',st.following]]);
   var fb=$('uFollow');fb.hidden=(u===uid());var fol=profile.following||[];
   function paint(){var on=(profile.following||[]).indexOf(u)>=0;fb.textContent=on?'Following ✓':'Follow';fb.classList.toggle('ghost',on)}paint();
   fb.onclick=async function(){if(!needAccount('Create a free account to follow people.'))return;var f=(profile.following||[]).slice(),i=f.indexOf(u);if(i>=0)f.splice(i,1);else f.push(u);profile.following=f;paint();
@@ -1332,7 +1346,7 @@ function applyMember(){
   var on=!!member;
   $('welcomeBox').hidden=!on;$('me').hidden=!on;$('meTab').hidden=!on;$('bellWrap').hidden=!on;if(on){loadNotes();if(auth&&auth.currentUser&&auth.currentUser.email&&!$('newsEmail').value)$('newsEmail').value=auth.currentUser.email}if(on){fillEditor();renderMe()}
   if(on){$('joinTitle').textContent='Welcome to the Garage, '+member.name+'!';
-    $('joinText').textContent=member.type==='enthusiast'?'Thanks for applying as a Verified Enthusiast. We will send you a short car-knowledge check by email. Until then you can post and reply as a member.':'You can now post questions, reply and vote in the Garage.';
+    $('joinText').textContent=member.type==='enthusiast'?'You are an Enthusiast applicant. Help people in the Garage: our editors regularly review the most helpful members and give them the Verified Enthusiast badge.':'You can now post questions, reply and vote in the Garage.';
     $('authTabs').hidden=true;$('joinForm').hidden=true;$('loginForm').hidden=true;$('verifyBox').hidden=true;$('signUp').href='#me';paintMyAvatar();$('signIn').textContent='Log out'}
   else{$('joinTitle').textContent='Join the community';$('signUp').textContent='Join the community';$('signUp').href='#join';$('signIn').textContent='Log in'}
   $('aiStatus').textContent='Free for everyone, no account needed. Ask anything about your car.'
