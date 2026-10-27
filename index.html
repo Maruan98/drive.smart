@@ -1266,6 +1266,7 @@ function errText(e){var c=(e&&e.code)||'';
   if(c.indexOf('unauthorized-domain')>=0)return 'This website address is not allowed yet in Firebase (Authorized domains).';
   return 'Something went wrong. Please try again. ('+(c||'unknown')+')'}
 function loadScript(src){return new Promise(function(ok,ko){var sc=document.createElement('script');sc.src=src;sc.onload=ok;sc.onerror=ko;document.head.appendChild(sc)})}
+function signedIn(u){var first=!member||member.uid!==u.uid;member=userToMember(u);member.uid=u.uid;applyMember();if(first){loadProfile();loadLikes()}}
 function userToMember(u){return {name:(u.displayName||u.email.split('@')[0]).slice(0,30),type:lsGet('ds-type-'+u.uid)||'member'}}
 (async function(){
   if(!FIREBASE_CONFIG)return;
@@ -1273,7 +1274,9 @@ function userToMember(u){return {name:(u.displayName||u.email.split('@')[0]).sli
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
       firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();
       try{await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');db=firebase.firestore();loadCommunity()}catch(x){db=null}
-      auth.onAuthStateChanged(function(u){member=u&&u.emailVerified?userToMember(u):null;applyMember();if(member){loadProfile();loadLikes()}else{profile={car:null,bio:'',photo:'',following:[]};myLikes={};renderFeed()}});
+      auth.onAuthStateChanged(async function(u){
+        if(u&&!u.emailVerified){try{await u.reload();u=auth.currentUser;if(u.emailVerified)await u.getIdToken(true)}catch(x){}}
+        if(u&&u.emailVerified){signedIn(u)}else{member=null;applyMember();profile={car:null,bio:'',photo:'',following:[]};myLikes={};renderFeed()}});
   }catch(e){auth=null}
 })();
 $('joinForm').addEventListener('submit',async function(e){e.preventDefault();var n=$('joinName').value.trim(),em=$('joinEmail').value.trim(),pw=$('joinPass').value;
@@ -1291,11 +1294,14 @@ $('loginForm').addEventListener('submit',async function(e){e.preventDefault();va
     if(m&&m.email===em){member=m;msg('');applyMember()}else msg('No account found with this email.');return}
   msg('Logging in...');
   try{var c=await auth.signInWithEmailAndPassword(em,pw);
-    if(!c.user.emailVerified){msg('');showVerify(em)}else msg('')}
+    var u=c.user;try{await u.reload();u=auth.currentUser}catch(x){}
+    if(!u.emailVerified){msg('');showVerify(em);return}
+    try{await u.getIdToken(true)}catch(x){}
+    signedIn(u);msg('');toast('Welcome back, '+member.name+'!')}
   catch(err){msg(errText(err))}});
 $('iVerified').onclick=async function(){if(!auth||!auth.currentUser){showTab('in');return}
   await auth.currentUser.reload();var u=auth.currentUser;
-  if(u.emailVerified){try{await u.getIdToken(true)}catch(x){}member=userToMember(u);msg('');applyMember();loadProfile()}
+  if(u.emailVerified){try{await u.getIdToken(true)}catch(x){}signedIn(u);msg('')}
   else msg('Your email is not confirmed yet. Click the link in the email first.')};
 $('resend').onclick=async function(){if(!auth||!auth.currentUser)return;try{await auth.currentUser.sendEmailVerification();msg('Email sent again.')}catch(err){msg(errText(err))}};
 $('forgot').onclick=async function(){var em=$('logEmail').value.trim();if(!em)return msg('Type your email above first.');
