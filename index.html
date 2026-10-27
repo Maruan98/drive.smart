@@ -1231,9 +1231,11 @@ document.querySelectorAll('#meTabs button').forEach(function(b){b.onclick=functi
 /* public profile page (#u-<id>) */
 async function showUser(u){var v=$('userView');var p=people[u];
   if(!p&&db){try{var d=await db.collection('profiles').doc(u).get();if(d.exists){p=people[u]=d.data()}}catch(e){}}
-  if(!p){$('uName').textContent='Profile not found';$('uCar').textContent='';$('uBio').textContent='';$('uStats').textContent='';$('uPosts').textContent='';$('uFollow').hidden=true;return}
+  if(!p){var known=threads.filter(function(t){return t.uid===u})[0];
+    if(!known&&!EDITORS[u]){$('uName').textContent='Profile not found';$('uCar').textContent='';$('uBio').textContent='';$('uStats').textContent='';$('uPosts').textContent='';$('uFollow').hidden=true;return}
+    p={name:known?known.who:'Member',bio:'',following:[],empty:true}}
   var av=$('uAvatar');av.textContent='';av.appendChild(avatar(p.name,u,null,96));
-  $('uName').textContent=p.name+(EDITORS[u]?' ✓':'');$('uCar').textContent=p.carLabel?'Drives a '+p.carLabel:'';$('uBio').textContent=p.bio||'';
+  $('uName').textContent=p.name+(EDITORS[u]?' ✓':'');$('uCar').textContent=p.carLabel?'Drives a '+p.carLabel:'';$('uBio').textContent=p.bio||(p.empty?'This member has not filled in their profile yet.':'');
   var st=await userStats(u);$('uCar').textContent=(p.carLabel?'Drives a '+p.carLabel:'')+(VERIFIED[u]?' · ✓ Verified Enthusiast':(p.applicant&&!EDITORS[u]?' · Enthusiast applicant':''));statBox($('uStats'),[['Posts',st.posts],['Replies',st.replies],['Likes received',st.likes],['Followers',st.followers],['Following',st.following]]);
   var fb=$('uFollow');fb.hidden=(u===uid());var fol=profile.following||[];
   function paint(){var on=(profile.following||[]).indexOf(u)>=0;fb.textContent=on?'Following ✓':'Follow';fb.classList.toggle('ghost',on)}paint();
