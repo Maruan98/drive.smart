@@ -1217,9 +1217,11 @@ function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)}
 $('newsForm').addEventListener('submit',async function(e){e.preventDefault();var v=$('newsEmail').value.trim().toLowerCase();
   if(!validEmail(v)){$('newsMsg').textContent='Please enter a valid email address.';return}
   $('newsMsg').textContent='Subscribing...';
-  try{if(db){await withTimeout(db.collection('newsletter').add({email:v.slice(0,120),created:ts()}))}
-    lsSet('ds-news','1');$('newsMsg').textContent=db?"You're in! Watch your inbox (and your spam folder, just in case).":'Demo mode: nothing was saved here.';$('newsEmail').value=''}
-  catch(err){$('newsMsg').textContent=errMsg(err)}});
+  var mailed=false;
+  try{var r=await withTimeout(fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:v})}));mailed=r.ok}catch(x){}
+  try{if(db){await withTimeout(db.collection('newsletter').add({email:v.slice(0,120),created:ts()}))}}catch(x){}
+  if(mailed||db){lsSet('ds-news','1');$('newsMsg').textContent=mailed?"You're in! We just sent you a welcome email (check your spam folder too).":"You're in! Watch your inbox for our next post.";$('newsEmail').value=''}
+  else $('newsMsg').textContent='Could not subscribe right now. Please try again in a minute.'});
 $('copyMail').onclick=function(){var v=$('mailAddr').textContent;if(navigator.clipboard)navigator.clipboard.writeText(v).then(function(){toast('Email copied')},function(){toast(v)});else toast(v)};
 $('contactForm').addEventListener('submit',async function(e){e.preventDefault();var n=$('cName').value.trim(),em=$('cEmail').value.trim(),m=$('cMsg').value.trim();
   if(!n||!validEmail(em)||m.length<5){$('cInfo').textContent='Please fill in your name, a valid email and a message.';return}
