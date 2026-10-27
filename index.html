@@ -870,11 +870,13 @@ function ts(){return firebase.firestore.FieldValue.serverTimestamp()}
 function needAccount(text){if(member)return true;showTab('up');$('join').scrollIntoView();$('joinName').focus();$('joinMsg').textContent=text||'Posting needs a free account. It takes 20 seconds.';return false}
 function when(t){if(!t||!t.toDate)return 'just now';var d=t.toDate(),m=Math.round((Date.now()-d)/60000);if(m<1)return 'just now';if(m<60)return m+' min ago';if(m<1440)return Math.round(m/60)+' h ago';return d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}
 /* writes: retry once with a fresh login token (needed right after confirming the email) */
-async function dbWrite(fn){try{return await fn()}catch(e){if(e&&e.code==='permission-denied'&&auth&&auth.currentUser){await auth.currentUser.reload();await auth.currentUser.getIdToken(true);return await fn()}throw e}}
+function withTimeout(pr){return Promise.race([pr,new Promise(function(_,ko){setTimeout(function(){var e=new Error('timeout');e.code='timeout';ko(e)},12000)})])}
+async function dbWrite(fn){try{return await withTimeout(fn())}catch(e){if(e&&e.code==='permission-denied'&&auth&&auth.currentUser){await auth.currentUser.reload();await auth.currentUser.getIdToken(true);return await withTimeout(fn())}throw e}}
 function errMsg(e){var c=(e&&e.code)||'';
   if(c==='permission-denied')return 'Not allowed. Make sure your email is confirmed (log out and log in again), and that the Firestore rules are published.';
   if(c==='not-found'||c==='failed-precondition')return 'The database is not set up yet (Firestore Database in Firebase).';
   if(c==='unavailable')return 'No connection. Try again in a moment.';
+  if(c==='timeout')return 'The database did not answer. In Firebase, check that Firestore Database is created (Bases de données et stockage > Firestore Database).';
   return 'Could not save ('+(c||(e&&e.message)||'unknown error')+').'}
 
 /* avatar: photo if the person has one, otherwise initials */
