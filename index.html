@@ -296,6 +296,13 @@ body.reading main{display:none}
 .join h2{margin:10px 0}
 .join form{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
 .join input{width:min(340px,100%);height:46px;border:1px solid var(--line);border-radius:999px;padding:0 16px;font:inherit;background:var(--card);color:var(--ink)}
+.authtabs{display:inline-flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin-top:22px}
+.authtabs button{border:0;background:none;border-radius:999px;padding:8px 18px;cursor:pointer;font-weight:600;color:var(--mute)}
+.authtabs button.on{background:var(--navy);color:#fff}
+.linkbtn{border:0;background:none;color:var(--navy);text-decoration:underline;cursor:pointer;font-weight:600}
+.authbox{margin-top:20px}
+.authbox p{margin-top:10px}
+.row2{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 #joinMsg{margin-top:12px;font-weight:600;color:var(--navy);min-height:1.6em}
 footer{background:var(--card);border-top:1px solid var(--line);padding-block:36px;font-size:.86rem;color:var(--mute)}
 footer .wrap{display:grid;grid-template-columns:1fr 2fr;gap:28px}
@@ -584,17 +591,33 @@ footer .refs{line-height:1.7}
 <!-- JOIN -->
 <section class="band join" id="join" style="background:var(--sky)">
   <div class="wrap">
-    <h2 id="joinTitle">Create your free account</h2>
-    <p class="mute" style="max-width:560px;margin:0 auto" id="joinText">Reading and the Garage Assistant are open to everyone. To post a question, reply or vote, you need a free account. Every account is a real person, that's how we keep the advice reliable.</p>
-    <form id="joinForm" class="acct">
+    <h2 id="joinTitle">Join the community</h2>
+    <p class="mute" style="max-width:560px;margin:0 auto" id="joinText">Reading and the Garage Assistant are open to everyone. To post a question, reply or vote, you need a free account. We check every email, that's how we keep the advice reliable.</p>
+    <div class="authtabs" id="authTabs" role="tablist"><button type="button" data-t="up" class="on" role="tab">Create account</button><button type="button" data-t="in" role="tab">Log in</button></div>
+    <form id="joinForm" class="acct" novalidate>
       <input id="joinName" type="text" placeholder="First name" aria-label="First name" autocomplete="given-name">
       <input id="joinEmail" type="email" placeholder="Email" aria-label="Email" autocomplete="email">
+      <input id="joinPass" type="password" placeholder="Password (6 characters min.)" aria-label="Password" autocomplete="new-password">
       <select id="joinType" aria-label="I am">
         <option value="member">I'm a student or first-time buyer</option>
         <option value="enthusiast">I know cars and want to help (apply as Enthusiast)</option>
       </select>
       <button class="btn" type="submit">Create account</button>
     </form>
+    <form id="loginForm" class="acct" novalidate hidden>
+      <input id="logEmail" type="email" placeholder="Email" aria-label="Email" autocomplete="email">
+      <input id="logPass" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password">
+      <button class="btn" type="submit">Log in</button>
+      <button class="linkbtn" type="button" id="forgot">Forgot password?</button>
+    </form>
+    <div id="verifyBox" class="authbox" hidden>
+      <p id="verifyText"></p>
+      <p class="row2"><button class="btn" type="button" id="iVerified">I clicked the link</button><button class="btn ghost" type="button" id="resend">Send the email again</button></p>
+      <p class="mute" style="font-size:.88rem">Can't find it? Check your spam folder.</p>
+    </div>
+    <div id="welcomeBox" class="authbox" hidden>
+      <p class="row2"><a class="btn" href="#garage">Go to the Garage</a><button class="btn ghost" type="button" id="logout">Log out</button></p>
+    </div>
     <p id="joinMsg" aria-live="polite"></p>
   </div>
 </section>
@@ -685,9 +708,13 @@ document.querySelectorAll('[data-soon]').forEach(function(a){a.addEventListener(
 
 /* ---------- FEED ---------- */
 /* ---------- MEMBER (simple sign-up kept in this browser) ---------- */
-var member=null;
-try{member=JSON.parse(localStorage.getItem('ds-member')||'null')}catch(e){member=null}
-function saveMember(){try{localStorage.setItem('ds-member',JSON.stringify(member))}catch(e){}}
+/* Firebase project settings: paste the firebaseConfig object here (it is safe to be public). null = demo mode */
+var FIREBASE_CONFIG={apiKey:"AIzaSyBO2QFq10lAKuPKnJCTBYAz21_BuhvlmOw",authDomain:"drive-smart-abadf.firebaseapp.com",projectId:"drive-smart-abadf",storageBucket:"drive-smart-abadf.firebasestorage.app",messagingSenderId:"688716605160",appId:"1:688716605160:web:880c97fafccf695bc68b5d"};
+var member=null,auth=null;
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}
+if(!FIREBASE_CONFIG){try{member=JSON.parse(lsGet('ds-member')||'null')}catch(e){member=null}}
+function saveMember(){lsSet('ds-member',member?JSON.stringify(member):null)}
 
 /* ---------- FEED: editors' first posts ---------- */
 var threads=[
@@ -721,7 +748,7 @@ document.querySelectorAll('.topic,.mtabs button').forEach(function(b){b.onclick=
 document.querySelectorAll('a[data-f],button[data-go]').forEach(function(a){a.addEventListener('click',function(e){setFilter(a.dataset.f);if(a.dataset.go){e.preventDefault();$('garage').scrollIntoView()}})});
 /* actions that need an account */
 function wireNeed(root){(root||document).querySelectorAll('[data-need]').forEach(function(b){b.onclick=function(){
-  if(!member){$('join').scrollIntoView();$('joinName').focus();$('joinMsg').textContent='Posting needs a free account. It takes 20 seconds.';return}
+  if(!member){showTab('up');$('join').scrollIntoView();$('joinName').focus();$('joinMsg').textContent='Posting needs a free account. It takes 20 seconds.';return}
   $('assistant').scrollIntoView({block:'center'});$('aiQ').focus()}})}
 renderFeed();wireNeed(document);
 
@@ -789,11 +816,18 @@ function addMsg(cls,txt){var m=el('div','msg '+cls,txt);$('chat').appendChild(m)
 addMsg('note','Example of how it answers:');
 addMsg('me','My Civic makes a clicking noise when I turn. Is it bad?');
 addMsg('bot','That clicking is often a worn CV axle, the shaft that turns your front wheels. Not an emergency today, but book a mechanic soon, because if it breaks the car stops moving. Post a short video in the Garage so an editor can listen too.');
+function showTab(t){document.querySelectorAll('#authTabs button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t)});
+  $('authTabs').hidden=false;$('joinForm').hidden=t!=='up';$('loginForm').hidden=t!=='in';$('verifyBox').hidden=true;$('joinMsg').textContent=''}
+document.querySelectorAll('#authTabs button').forEach(function(b){b.onclick=function(){showTab(b.dataset.t)}});
+function showVerify(email){$('joinForm').hidden=true;$('loginForm').hidden=true;$('authTabs').hidden=true;$('verifyBox').hidden=false;
+  $('verifyText').textContent='Almost done! We sent a link to '+email+'. Click it to confirm your email, then come back here.'}
 function applyMember(){
   var on=!!member;
+  $('welcomeBox').hidden=!on;
   if(on){$('joinTitle').textContent='Welcome to the Garage, '+member.name+'!';
     $('joinText').textContent=member.type==='enthusiast'?'Thanks for applying as a Verified Enthusiast. We will send you a short car-knowledge check by email. Until then you can post and reply as a member.':'You can now post questions, reply and vote in the Garage.';
-    $('joinForm').hidden=true;$('signUp').textContent='Hi '+member.name;$('signIn').hidden=true}
+    $('authTabs').hidden=true;$('joinForm').hidden=true;$('loginForm').hidden=true;$('verifyBox').hidden=true;$('signUp').textContent='Hi '+member.name;$('signIn').textContent='Log out'}
+  else{$('joinTitle').textContent='Join the community';$('signUp').textContent='Join the community';$('signIn').textContent='Log in'}
   $('aiStatus').textContent='Free for everyone, no account needed. Ask anything about your car.'
 }
 (async function(){try{if(window.claude&&claude.use){sample=await claude.use('sample')}}catch(e){sample=null}applyMember()})();
@@ -823,11 +857,56 @@ $('aiQ').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey)
 $('heroAsk').addEventListener('submit',function(e){e.preventDefault();var q=$('heroQ').value.trim();$('assistant').scrollIntoView({block:'center'});if(q){$('aiQ').value=q;$('aiForm').requestSubmit();$('heroQ').value=''}else{$('aiQ').focus()}});
 $('topSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){$('heroQ').value=this.value;$('heroAsk').requestSubmit();this.value=''}});
 
-/* join */
-$('joinForm').addEventListener('submit',function(e){e.preventDefault();var n=$('joinName').value.trim();
-  if(!n){$('joinMsg').textContent='Please enter your first name.';return}
-  if(!/\S+@\S+\.\S+/.test($('joinEmail').value)){$('joinMsg').textContent='Please enter a valid email address.';return}
-  member={name:n.slice(0,30),type:$('joinType').value};saveMember();$('joinMsg').textContent='';applyMember()});
+/* ---------- ACCOUNTS (Firebase email + password, email verification) ---------- */
+function msg(t){$('joinMsg').textContent=t}
+function errText(e){var c=(e&&e.code)||'';
+  if(c.indexOf('email-already-in-use')>=0)return 'An account already exists with this email. Try logging in.';
+  if(c.indexOf('invalid-email')>=0)return 'This email address is not valid.';
+  if(c.indexOf('weak-password')>=0)return 'Your password needs at least 6 characters.';
+  if(/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c))return 'Wrong email or password.';
+  if(c.indexOf('too-many-requests')>=0)return 'Too many tries. Wait a few minutes and try again.';
+  if(c.indexOf('network')>=0)return 'No connection. Check your internet and try again.';
+  if(c.indexOf('unauthorized-domain')>=0)return 'This website address is not allowed yet in Firebase (Authorized domains).';
+  return 'Something went wrong. Please try again. ('+(c||'unknown')+')'}
+function loadScript(src){return new Promise(function(ok,ko){var sc=document.createElement('script');sc.src=src;sc.onload=ok;sc.onerror=ko;document.head.appendChild(sc)})}
+function userToMember(u){return {name:(u.displayName||u.email.split('@')[0]).slice(0,30),type:lsGet('ds-type-'+u.uid)||'member'}}
+(async function(){
+  if(!FIREBASE_CONFIG)return;
+  try{await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+      await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
+      firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();
+      auth.onAuthStateChanged(function(u){member=u&&u.emailVerified?userToMember(u):null;applyMember()});
+  }catch(e){auth=null}
+})();
+$('joinForm').addEventListener('submit',async function(e){e.preventDefault();var n=$('joinName').value.trim(),em=$('joinEmail').value.trim(),pw=$('joinPass').value;
+  if(!n)return msg('Please enter your first name.');
+  if(!/\S+@\S+\.\S+/.test(em))return msg('Please enter a valid email address.');
+  if(pw.length<6)return msg('Your password needs at least 6 characters.');
+  if(!auth){member={name:n.slice(0,30),type:$('joinType').value,email:em};saveMember();applyMember();msg('Demo mode: no email is sent here.');return}
+  msg('Creating your account...');
+  try{var c=await auth.createUserWithEmailAndPassword(em,pw);lsSet('ds-type-'+c.user.uid,$('joinType').value);
+    await c.user.updateProfile({displayName:n.slice(0,30)});await c.user.sendEmailVerification();msg('');showVerify(em)}
+  catch(err){msg(errText(err))}});
+$('loginForm').addEventListener('submit',async function(e){e.preventDefault();var em=$('logEmail').value.trim(),pw=$('logPass').value;
+  if(!em||!pw)return msg('Enter your email and password.');
+  if(!auth){var m=null;try{m=JSON.parse(lsGet('ds-member')||'null')}catch(x){}
+    if(m&&m.email===em){member=m;msg('');applyMember()}else msg('No account found with this email.');return}
+  msg('Logging in...');
+  try{var c=await auth.signInWithEmailAndPassword(em,pw);
+    if(!c.user.emailVerified){msg('');showVerify(em)}else msg('')}
+  catch(err){msg(errText(err))}});
+$('iVerified').onclick=async function(){if(!auth||!auth.currentUser){showTab('in');return}
+  await auth.currentUser.reload();var u=auth.currentUser;
+  if(u.emailVerified){member=userToMember(u);msg('');applyMember()}
+  else msg('Your email is not confirmed yet. Click the link in the email first.')};
+$('resend').onclick=async function(){if(!auth||!auth.currentUser)return;try{await auth.currentUser.sendEmailVerification();msg('Email sent again.')}catch(err){msg(errText(err))}};
+$('forgot').onclick=async function(){var em=$('logEmail').value.trim();if(!em)return msg('Type your email above first.');
+  if(!auth)return msg('Demo mode: password reset is not available here.');
+  try{await auth.sendPasswordResetEmail(em);msg('If an account exists, we sent you a link to reset your password.')}catch(err){msg(errText(err))}};
+function logout(){member=null;if(auth)auth.signOut();else saveMember();showTab('up');applyMember()}
+$('logout').onclick=logout;
+$('signIn').addEventListener('click',function(e){if(member){e.preventDefault();logout()}else{showTab('in')}});
+$('signUp').addEventListener('click',function(){if(!member)showTab('up')});
 </script>
 
 </body>
