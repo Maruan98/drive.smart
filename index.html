@@ -1240,7 +1240,10 @@ async function showUser(u){var v=$('userView');var p=people[u];
   var fb=$('uFollow');fb.hidden=(u===uid());var fol=profile.following||[];
   function paint(){var on=(profile.following||[]).indexOf(u)>=0;fb.textContent=on?'Following ✓':'Follow';fb.classList.toggle('ghost',on)}paint();
   fb.onclick=async function(){if(!needAccount('Create a free account to follow people.'))return;var f=(profile.following||[]).slice(),i=f.indexOf(u);if(i>=0)f.splice(i,1);else f.push(u);profile.following=f;paint();
-    try{await savePublic();showUser(u)}catch(e){toast(errMsg(e))}};
+    var now=f.indexOf(u)>=0;
+    try{await savePublic();
+      if(db&&uid()){var fid=uid()+'_'+u;dbWrite(function(){return now?db.collection('follows').doc(fid).set({from:uid(),to:u,name:member.name,created:ts()}):db.collection('follows').doc(fid).delete()}).catch(function(){})}
+      showUser(u)}catch(e){toast(errMsg(e))}};
   var pl=$('uPosts');pl.textContent='';var mine=threads.filter(function(t){return t.uid===u});if(!mine.length)pl.appendChild(el('p','mute','No posts yet.'));mine.forEach(function(t){pl.appendChild(threadLink(t))})}
 
 function setFilter(f){filt=f;document.querySelectorAll('[data-f]').forEach(function(x){if(x.classList.contains('topic')||x.closest('.mtabs'))x.classList.toggle('on',x.dataset.f===f)});renderFeed()}
@@ -1285,18 +1288,25 @@ var notes=[];
 function lastSeen(){return +(lsGet('ds-seen-'+(uid()||''))||0)}
 async function loadNotes(){if(!member||!db){$('bellWrap').hidden=!member;return}
   $('bellWrap').hidden=false;var seen=lastSeen(),me=uid(),list=[];
-  threads.forEach(function(t){if(t.created&&t.created.seconds&&t.uid!==me)list.push({kind:'post',t:t,at:t.created.seconds*1000,text:t.who+' posted: '+t.t})});
+  threads.forEach(function(t){if(t.created&&t.created.seconds&&t.uid!==me)list.push({kind:'post',t:t,at:t.created.seconds*1000,text:(people[t.uid]&&people[t.uid].name||t.who)+' posted: '+t.t})});
   try{var r=await db.collection('replies').where('threadOwner','==',me).get();
     r.forEach(function(d){var x=d.data();if(x.uid===me||!x.created||!x.created.seconds)return;var t=threads.filter(function(y){return y.id===x.thread})[0];
       list.push({kind:'reply',t:t,at:x.created.seconds*1000,text:(x.name||'Someone')+' replied to your post'+(t?': '+t.t:'')})})}catch(e){}
+  function who(u){return people[u]&&people[u].name||'Someone'}
+  try{var lk=await db.collection('likes').where('owner','==',me).get();
+    lk.forEach(function(d){var x=d.data();if(x.uid===me||!x.created||!x.created.seconds)return;var isPost=x.target.indexOf('t_')===0,t=isPost?threads.filter(function(y){return 't_'+y.id===x.target})[0]:null;
+      list.push({kind:'like',t:t,u:x.uid,at:x.created.seconds*1000,text:who(x.uid)+' liked your '+(isPost?'post'+(t?': '+t.t:''):'reply')})})}catch(e){}
+  try{var fo=await db.collection('follows').where('to','==',me).get();
+    fo.forEach(function(d){var x=d.data();if(!x.created||!x.created.seconds)return;
+      list.push({kind:'follow',u:x.from,at:x.created.seconds*1000,text:(people[x.from]&&people[x.from].name||x.name||'Someone')+' started following you'})})}catch(e){}
   (profile.following||[]).length&&list.forEach(function(n){if(n.kind==='post'&&profile.following.indexOf(n.t.uid)>=0)n.text='⭐ '+n.text});
   list.sort(function(a,b){return b.at-a.at});notes=list.slice(0,20);
   var nNew=notes.filter(function(n){return n.at>seen}).length;$('bellCount').hidden=!nNew;$('bellCount').textContent=nNew>9?'9+':nNew;drawNotes()}
 function drawNotes(){var box=$('bellList'),seen=lastSeen();box.textContent='';
-  if(!notes.length){box.appendChild(el('p','mute','Nothing new yet. New posts and replies to your posts will show up here.'));return}
+  if(!notes.length){box.appendChild(el('p','mute','Nothing new yet. New posts, replies, likes and new followers will show up here.'));return}
   notes.forEach(function(n){var b=el('button','nitem'+(n.at>seen?' new':''));b.type='button';b.appendChild(document.createTextNode(n.text));
     b.appendChild(el('span',null,when({toDate:function(){return new Date(n.at)}})));
-    b.onclick=function(){$('bellMenu').hidden=true;$('bellBtn').setAttribute('aria-expanded','false');if(n.t){openThread=n.t.id;setFilter('all');location.hash='#garage';setTimeout(function(){$('garage').scrollIntoView()},60)}};box.appendChild(b)})}
+    b.onclick=function(){$('bellMenu').hidden=true;$('bellBtn').setAttribute('aria-expanded','false');if(n.kind==='follow'&&n.u){location.hash='#u-'+n.u;return}if(n.t){openThread=n.t.id;setFilter('all');location.hash='#garage';setTimeout(function(){$('garage').scrollIntoView()},60)}};box.appendChild(b)})}
 $('bellBtn').onclick=function(e){e.stopPropagation();var m=$('bellMenu');m.hidden=!m.hidden;this.setAttribute('aria-expanded',String(!m.hidden));if(!m.hidden)drawNotes()};
 $('bellRead').onclick=function(){lsSet('ds-seen-'+(uid()||''),String(Date.now()));$('bellCount').hidden=true;drawNotes()};
 document.addEventListener('click',function(e){if(!$('bellWrap').contains(e.target))$('bellMenu').hidden=true});
