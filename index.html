@@ -682,6 +682,7 @@ footer .refs{line-height:1.7}
         <h3 style="font-size:1.6rem;margin-top:4px">What will this car really cost you each month?</h3>
         <label for="cP">Car price <output id="oP"></output></label><input id="cP" type="range" min="3000" max="20000" step="500" value="8500">
         <label for="cR">Loan interest per year <output id="oR"></output></label><input id="cR" type="range" min="0" max="15" step="0.5" value="7">
+        <label for="cN">Loan length <output id="oN"></output></label><input id="cN" type="range" min="12" max="96" step="12" value="48">
         <label for="cI">Insurance per month <output id="oI"></output></label><input id="cI" type="range" min="80" max="500" step="10" value="210">
         <label for="cF">Gas per month <output id="oF"></output></label><input id="cF" type="range" min="0" max="400" step="10" value="130">
         <label for="cM">Repairs and maintenance per month <output id="oM"></output></label><input id="cM" type="range" min="0" max="250" step="10" value="70">
@@ -692,7 +693,7 @@ footer .refs{line-height:1.7}
         <p class="mute" id="yr"></p>
         <div class="bar" id="bar"></div>
         <div class="legend" id="leg"></div>
-        <p class="mute" style="font-size:.82rem;margin-top:14px">Estimate based on a 48-month loan on the full price. Insurance for drivers under 25 in Ontario is often the biggest surprise, so get a quote before you buy.</p>
+        <p class="mute" style="font-size:.82rem;margin-top:14px">Estimate based on a loan on the full price, with no down payment. Insurance for drivers under 25 in Ontario is often the biggest surprise, so get a quote before you buy.</p>
       </div>
     </div>
   </div>
@@ -1350,13 +1351,13 @@ document.querySelectorAll('a[data-cat]').forEach(function(a){a.addEventListener(
 
 /* ---------- TRUE COST ---------- */
 function money(x){return '$'+Math.round(x).toLocaleString('en-CA')}
-function cost(){var P=+$('cP').value,r=+$('cR').value/1200,n=48,i=+$('cI').value,f=+$('cF').value,m=+$('cM').value;
-  $('oP').textContent=money(P);$('oR').textContent=$('cR').value+'%';$('oI').textContent=money(i);$('oF').textContent=money(f);$('oM').textContent=money(m);
-  var l=r?P*r/(1-Math.pow(1+r,-n)):P/n,t=l+i+f+m;$('tot').textContent=money(t);$('yr').textContent='About '+money(t*12)+' a year.';
+function cost(){var P=+$('cP').value,r=+$('cR').value/1200,n=+$('cN').value,i=+$('cI').value,f=+$('cF').value,m=+$('cM').value;
+  $('oP').textContent=money(P);$('oR').textContent=$('cR').value+'%';$('oN').textContent=n+' months ('+(n/12)+(n===12?' year)':' years)');$('oI').textContent=money(i);$('oF').textContent=money(f);$('oM').textContent=money(m);
+  var l=r?P*r/(1-Math.pow(1+r,-n)):P/n,t=l+i+f+m;$('tot').textContent=money(t);var interest=r?l*n-P:0;$('yr').textContent='About '+money(t*12)+' a year.'+(interest>0?' Total loan interest: '+money(interest)+'.':'');
   var c=[['Car payment',l,'#24375F'],['Insurance',i,'#6F8BB8'],['Gas',f,'#C9B48E'],['Repairs',m,'#A9512F']];
   var bar=$('bar'),leg=$('leg');bar.textContent='';leg.textContent='';
   c.forEach(function(x){var d=el('div');d.style.width=(x[1]/t*100)+'%';d.style.background=x[2];bar.appendChild(d);var s=el('span',null,x[0]+' '+money(x[1]));s.style.setProperty('--c',x[2]);leg.appendChild(s)})}
-['cP','cR','cI','cF','cM'].forEach(function(k){$(k).addEventListener('input',cost)});cost();
+['cP','cR','cN','cI','cF','cM'].forEach(function(k){$(k).addEventListener('input',cost)});cost();
 
 /* ---------- GARAGE ASSISTANT (AI) ---------- */
 var sample=null,turns=[],busy=false;
