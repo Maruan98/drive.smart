@@ -145,6 +145,20 @@ header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgrou
 .pricebox b{font-size:1.25rem;color:var(--navy)}
 .pcta{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
 body.reading main{display:none}
+.newpost{background:var(--card);border:1px solid #C9D3E3;border-radius:var(--r);padding:16px 18px;margin-bottom:14px;display:flex;flex-direction:column;gap:10px}
+.newpost input,.newpost textarea,.newpost select,.rbox textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;background:var(--paper);color:var(--ink)}
+.newpost textarea{min-height:96px;resize:vertical}
+.nprow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.nprow select{width:auto;flex:1;min-width:160px}
+.npmsg{font-size:.88rem;color:var(--navy);font-weight:600;min-height:1.2em}
+.replies{margin-top:12px;border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.reply{background:var(--paper);border-radius:10px;padding:10px 12px}
+.reply .meta{margin-bottom:4px}
+.reply p{white-space:pre-wrap;font-size:.95rem}
+.rbox{display:flex;flex-direction:column;gap:8px}
+.rbox textarea{min-height:70px;resize:vertical}
+.rbox .nprow .btn{min-height:38px}
+.tfoot button.on{color:var(--navy);font-weight:600}
 .lock{background:var(--paper);border:1px dashed #C9D3E3;border-radius:10px;padding:14px;margin-top:12px;font-size:.92rem;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
 .acct{max-width:760px;margin-left:auto;margin-right:auto}
 .acct input,.acct select{width:min(240px,100%);height:46px;border:1px solid var(--line);border-radius:999px;padding:0 16px;font:inherit;background:var(--card);color:var(--ink)}
@@ -474,6 +488,14 @@ footer .refs{line-height:1.7}
       <div class="mtabs" role="group" aria-label="Topics">
         <button class="chip" data-f="all">Everything</button><button class="chip" data-f="fix">Problems &amp; fixes</button><button class="chip" data-f="talk">Car Talk</button><button class="chip" data-f="buy">Buying</button><button class="chip" data-f="global">Global</button>
       </div>
+      <form id="newPost" class="newpost" hidden>
+        <h3>Ask the Garage</h3>
+        <input id="npTitle" type="text" maxlength="140" placeholder="Your question in one line, e.g. Is a 2014 Civic with 160,000 km a good deal?" aria-label="Title">
+        <textarea id="npBody" maxlength="2000" placeholder="Add details: car, year, kilometres, what you hear or see, price..." aria-label="Details"></textarea>
+        <div class="nprow"><select id="npCat" aria-label="Topic"><option value="fix">Problems &amp; fixes</option><option value="buy">Buying</option><option value="talk">Car Talk</option><option value="global">Global Garage</option></select>
+        <button class="btn" type="submit">Post</button><button class="btn ghost" type="button" id="npCancel">Cancel</button></div>
+        <p class="npmsg" id="npMsg" aria-live="polite"></p>
+      </form>
       <div id="feed"></div>
     </div>
 
@@ -537,7 +559,7 @@ footer .refs{line-height:1.7}
       <div class="talktext">
         <p>Love cars and just want to talk about them? This is your corner. New models, mods worth doing, JDM classics, car meets around Kingston.</p>
         <p class="mute">It's empty for now because we just launched. Start the first discussion!</p>
-        <p><button class="btn" type="button" data-need="post">Start a discussion</button></p>
+        <p><button class="btn" type="button" data-need="post" data-cat="talk">Start a discussion</button></p>
       </div>
       </div>
     </div>
@@ -702,7 +724,7 @@ footer .refs{line-height:1.7}
     <div class="pricebox"><div><span>Pads only, one axle, at a garage</span><b>about $120–250</b></div><div><span>Pads and discs, one axle, at a garage</span><b>about $250–450</b></div><div><span>Pads alone, if you or a friend can do it</span><b>about $50–100</b></div></div>
     <p>Usually only the front pads need changing, because the front brakes do most of the work. Ask the shop to show you the old pads and tell you how many millimetres are left. Most of the price is labour, so an independent garage is often cheaper than a dealer. If someone quotes "brakes all around" for $500 or more on a small car, get a second opinion.</p>
 
-    <div class="pcta"><a class="btn" href="#fix">Check another noise</a><button class="btn ghost" type="button" data-need="post">Share your brake story</button></div>
+    <div class="pcta"><a class="btn" href="#fix">Check another noise</a><button class="btn ghost" type="button" data-need="story">Share your brake story</button></div>
   </div>
 </article>
 </div>
@@ -745,9 +767,9 @@ function saveMember(){lsSet('ds-member',member?JSON.stringify(member):null)}
 
 /* ---------- FEED: editors' first posts ---------- */
 var threads=[
- {f:'buy',kind:'Buying guide',fc:'',t:'Our top 2 first cars under $10k',ex:'Corolla or Civic? The years to look for, what to check before buying, and the fair price so you don\'t overpay.',who:'Cesar Breitner',role:'Editor',av:'#7A5A2E',link:'#post-cars'},
- {f:'fix',kind:'Fix Smart',fc:'',t:'I hear a squeal when I brake. Do I need new pads?',ex:'The most common car noise, and the one that scares people the most. Why it happens, when it gets serious, and what it should cost in Kingston.',who:'Maruan Hdioud',role:'Editor',av:'#24375F',link:'#post-brakes'},
- {f:'talk',kind:'Open discussion',fc:'talk',t:'What was your first car? Tell us the story',ex:'Good or bad, we want to hear it. Create a free account to reply.',who:'Maruan Hdioud',role:'Editor',av:'#24375F'}
+ {id:'top2-cars',f:'buy',kind:'Buying guide',fc:'',t:'Our top 2 first cars under $10k',ex:'Corolla or Civic? The years to look for, what to check before buying, and the fair price so you don\'t overpay.',who:'Cesar Breitner',role:'Editor',av:'#7A5A2E',link:'#post-cars'},
+ {id:'brake-squeal',f:'fix',kind:'Fix Smart',fc:'',t:'I hear a squeal when I brake. Do I need new pads?',ex:'The most common car noise, and the one that scares people the most. Why it happens, when it gets serious, and what it should cost in Kingston.',who:'Maruan Hdioud',role:'Editor',av:'#24375F',link:'#post-brakes'},
+ {id:'first-car',f:'talk',kind:'Open discussion',fc:'talk',t:'What was your first car? Tell us the story',ex:'Good or bad, we want to hear it. Create a free account to reply.',who:'Maruan Hdioud',role:'Editor',av:'#24375F'}
 ];
 var filt='all';
 function initials(n){return n.split(/\s/).filter(Boolean).map(function(s){return s[0]}).join('').slice(0,2).toUpperCase()}
@@ -764,19 +786,70 @@ function renderFeed(){
     a.appendChild(m);var h=el('h3');if(t.link){var ln=el('a',null,t.t);ln.href=t.link;ln.style.textDecoration='none';h.appendChild(ln)}else h.textContent=t.t;a.appendChild(h);a.appendChild(el('p','ex',t.ex));
     if(t.link){var rd=el('a','link','Read the post →');rd.href=t.link;var rp=el('p');rp.style.marginTop='8px';rp.appendChild(rd);a.appendChild(rp)}
     if(t.best){var bb=el('div','best');bb.appendChild(el('b',null,'Editor answer · '+t.best.who));bb.appendChild(document.createElement('br'));bb.appendChild(document.createTextNode(t.best.txt));a.appendChild(bb)}
-    var fo=el('div','tfoot');
-    ['Reply','Save','Share','Flag'].forEach(function(x){var b=el('button',null,x);if(x!=='Share')b.dataset.need='post';fo.appendChild(b)});
-    a.appendChild(fo);feed.appendChild(a);
+    var fo=el('div','tfoot');var rz=el('div','replies');rz.hidden=true;
+    var rb=el('button',null,'💬 Reply');rb.onclick=function(){toggleReplies(t,rz,rb)};fo.appendChild(rb);
+    var sv=el('button',saved[t.id]?'on':'',saved[t.id]?'Saved':'Save');sv.onclick=function(){if(!needAccount())return;saved[t.id]=!saved[t.id];lsSet('ds-saved',JSON.stringify(saved));sv.textContent=saved[t.id]?'Saved':'Save';sv.classList.toggle('on',!!saved[t.id])};fo.appendChild(sv);
+    var sh=el('button',null,'Share');sh.onclick=function(){var url=location.origin+location.pathname+(t.link||'#garage');
+      if(navigator.clipboard)navigator.clipboard.writeText(url).then(function(){toast('Link copied')},function(){toast(url)});else toast(url)};fo.appendChild(sh);
+    var fl=el('button',null,'Flag');fl.onclick=function(){if(!needAccount())return;if(db)db.collection('flags').add({thread:t.id,uid:auth.currentUser.uid,created:firebase.firestore.FieldValue.serverTimestamp()}).catch(function(){});fl.textContent='Flagged';fl.disabled=true;toast('Thanks, an editor will review this post.')};fo.appendChild(fl);
+    a.appendChild(fo);a.appendChild(rz);feed.appendChild(a);
+    if(openThread===t.id)toggleReplies(t,rz,rb);
   });
-  wireNeed(feed);
 }
+var saved={};try{saved=JSON.parse(lsGet('ds-saved')||'{}')||{}}catch(e){saved={}}
+var openThread=null,localReplies={};
+function needAccount(text){if(member)return true;showTab('up');$('join').scrollIntoView();$('joinName').focus();$('joinMsg').textContent=text||'Posting needs a free account. It takes 20 seconds.';return false}
+function when(ts){if(!ts||!ts.toDate)return 'just now';var d=ts.toDate(),m=Math.round((Date.now()-d)/60000);if(m<1)return 'just now';if(m<60)return m+' min ago';if(m<1440)return Math.round(m/60)+' h ago';return d.toLocaleDateString('en-CA',{month:'short',day:'numeric'})}
+function replyEl(r){var d=el('div','reply');var m=el('div','meta');var av=el('span','av',initials(r.name||'?'));av.style.background='#6F8BB8';m.appendChild(av);m.appendChild(el('span',null,r.name||'Member'));m.appendChild(el('span',null,'· '+when(r.created)));d.appendChild(m);d.appendChild(el('p',null,r.body));return d}
+async function toggleReplies(t,rz,rb){
+  if(!rz.hidden){rz.hidden=true;openThread=null;return}
+  rz.hidden=false;openThread=t.id;rz.textContent='';var list=el('div','replies-list');list.style.display='contents';rz.appendChild(list);
+  var loading=el('p','mute','Loading replies...');list.appendChild(loading);
+  var items=[];
+  if(db){try{var snap=await db.collection('replies').where('thread','==',t.id).get();snap.forEach(function(d){items.push(d.data())});
+      items.sort(function(a,b){return ((a.created&&a.created.seconds)||9e9)-((b.created&&b.created.seconds)||9e9)})}catch(e){loading.textContent='Could not load replies.'}}
+  else items=(localReplies[t.id]||[]).slice();
+  loading.remove();
+  if(!items.length)list.appendChild(el('p','mute','No replies yet. Be the first!'));
+  items.forEach(function(r){list.appendChild(replyEl(r))});
+  var box=el('form','rbox');
+  if(!member){var p=el('p','mute','Create a free account to reply. ');var j=el('a','link','Join the community');j.href='#join';j.onclick=function(){showTab('up')};p.appendChild(j);rz.appendChild(p);return}
+  var ta=el('textarea');ta.maxLength=2000;ta.placeholder='Write your reply...';ta.setAttribute('aria-label','Your reply');box.appendChild(ta);
+  var row=el('div','nprow');var go=el('button','btn','Post reply');go.type='submit';row.appendChild(go);var info=el('span','npmsg');row.appendChild(info);box.appendChild(row);
+  box.onsubmit=async function(e){e.preventDefault();var body=ta.value.trim();if(!body)return;go.disabled=true;
+    var r={thread:t.id,body:body.slice(0,2000),name:member.name,uid:auth&&auth.currentUser?auth.currentUser.uid:'demo'};
+    try{if(db){r.created=firebase.firestore.FieldValue.serverTimestamp();await db.collection('replies').add(r);r.created=null}
+        else{(localReplies[t.id]=localReplies[t.id]||[]).push(r)}
+      var empty=list.querySelector('p.mute');if(empty)empty.remove();list.appendChild(replyEl(r));ta.value='';info.textContent=db?'Posted!':'Demo mode: only you can see this.'}
+    catch(err){info.textContent='Could not post. Check that your email is confirmed, then try again.'}
+    go.disabled=false};
+  rz.appendChild(box);ta.focus();
+}
+function openNewPost(cat){if(!needAccount())return;setFilter('all');$('newPost').hidden=false;if(cat)$('npCat').value=cat;$('garage').scrollIntoView();setTimeout(function(){$('npTitle').focus()},300)}
+$('npCancel').onclick=function(){$('newPost').hidden=true;$('npMsg').textContent=''};
+$('newPost').addEventListener('submit',async function(e){e.preventDefault();var ti=$('npTitle').value.trim(),bo=$('npBody').value.trim();
+  if(ti.length<8)return $('npMsg').textContent='Write your question in one clear line (at least 8 characters).';
+  var cat=$('npCat').value,kinds={fix:'Question',buy:'Buying',talk:'Car Talk',global:'Global Garage'};
+  var t={f:cat,kind:kinds[cat],fc:cat==='talk'?'talk':'',t:ti.slice(0,140),ex:bo.slice(0,2000),who:member.name,role:'',av:'#6F8BB8'};
+  $('npMsg').textContent='Posting...';
+  try{if(db){var ref=await db.collection('threads').add({title:t.t,body:t.ex,cat:cat,name:member.name,uid:auth.currentUser.uid,created:firebase.firestore.FieldValue.serverTimestamp()});t.id=ref.id}
+      else{t.id='local-'+Date.now()}
+    threads.unshift(t);$('npTitle').value='';$('npBody').value='';$('newPost').hidden=true;$('npMsg').textContent='';renderFeed();toast(db?'Your question is live!':'Demo mode: only you can see this.')}
+  catch(err){$('npMsg').textContent='Could not post. Check that your email is confirmed, then try again.'}});
+var STATIC_THREADS=null;
+async function loadThreads(){if(!db)return;if(!STATIC_THREADS)STATIC_THREADS=threads.slice();
+  try{var snap=await db.collection('threads').orderBy('created','desc').limit(50).get();var dyn=[];
+    snap.forEach(function(d){var x=d.data(),kinds={fix:'Question',buy:'Buying',talk:'Car Talk',global:'Global Garage'};
+      dyn.push({id:d.id,f:x.cat,kind:kinds[x.cat]||'Question',fc:x.cat==='talk'?'talk':'',t:x.title,ex:x.body||'',who:x.name||'Member',role:'',av:'#6F8BB8'})});
+    threads=dyn.concat(STATIC_THREADS);renderFeed()}catch(e){}}
 function setFilter(f){filt=f;document.querySelectorAll('[data-f]').forEach(function(x){if(x.classList.contains('topic')||x.closest('.mtabs'))x.classList.toggle('on',x.dataset.f===f)});renderFeed()}
 document.querySelectorAll('.topic,.mtabs button').forEach(function(b){b.onclick=function(){setFilter(b.dataset.f)}});
 document.querySelectorAll('a[data-f],button[data-go]').forEach(function(a){a.addEventListener('click',function(e){setFilter(a.dataset.f);if(a.dataset.go){e.preventDefault();$('garage').scrollIntoView()}})});
 /* actions that need an account */
 function wireNeed(root){(root||document).querySelectorAll('[data-need]').forEach(function(b){b.onclick=function(){
-  if(!member){showTab('up');$('join').scrollIntoView();$('joinName').focus();$('joinMsg').textContent='Posting needs a free account. It takes 20 seconds.';return}
-  $('assistant').scrollIntoView({block:'center'});$('aiQ').focus()}})}
+  if(b.dataset.need==='story'){if(!needAccount())return;openThread='brake-squeal';setFilter('all');location.hash='#garage';return}
+  openNewPost(b.dataset.cat)}})}
+var db=null;
 renderFeed();wireNeed(document);
 
 /* ---------- POLL ---------- */
@@ -909,7 +982,8 @@ function userToMember(u){return {name:(u.displayName||u.email.split('@')[0]).sli
   try{await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
       await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
       firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();
-      auth.onAuthStateChanged(function(u){member=u&&u.emailVerified?userToMember(u):null;applyMember()});
+      try{await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');db=firebase.firestore();loadThreads()}catch(x){db=null}
+      auth.onAuthStateChanged(function(u){member=u&&u.emailVerified?userToMember(u):null;applyMember();renderFeed()});
   }catch(e){auth=null}
 })();
 $('joinForm').addEventListener('submit',async function(e){e.preventDefault();var n=$('joinName').value.trim(),em=$('joinEmail').value.trim(),pw=$('joinPass').value;
@@ -931,13 +1005,13 @@ $('loginForm').addEventListener('submit',async function(e){e.preventDefault();va
   catch(err){msg(errText(err))}});
 $('iVerified').onclick=async function(){if(!auth||!auth.currentUser){showTab('in');return}
   await auth.currentUser.reload();var u=auth.currentUser;
-  if(u.emailVerified){member=userToMember(u);msg('');applyMember()}
+  if(u.emailVerified){try{await u.getIdToken(true)}catch(x){}member=userToMember(u);msg('');applyMember();renderFeed()}
   else msg('Your email is not confirmed yet. Click the link in the email first.')};
 $('resend').onclick=async function(){if(!auth||!auth.currentUser)return;try{await auth.currentUser.sendEmailVerification();msg('Email sent again.')}catch(err){msg(errText(err))}};
 $('forgot').onclick=async function(){var em=$('logEmail').value.trim();if(!em)return msg('Type your email above first.');
   if(!auth)return msg('Demo mode: password reset is not available here.');
   try{await auth.sendPasswordResetEmail(em);msg('If an account exists, we sent you a link to reset your password.')}catch(err){msg(errText(err))}};
-function logout(){member=null;if(auth)auth.signOut();else saveMember();showTab('up');applyMember()}
+function logout(){member=null;if(auth)auth.signOut();else saveMember();showTab('up');applyMember();renderFeed()}
 $('logout').onclick=logout;
 $('signIn').addEventListener('click',function(e){if(member){e.preventDefault();logout()}else{showTab('in')}});
 $('signUp').addEventListener('click',function(){if(!member)showTab('up')});
