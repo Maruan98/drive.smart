@@ -266,7 +266,22 @@ a.who:hover{color:var(--navy);text-decoration:underline}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
 .panel h3{display:flex;align-items:center;gap:8px}
 .ai{border-color:#C9D3E3}
-.ai .status{font-size:.82rem;color:var(--mute);margin:4px 0 12px}
+.fab{position:fixed;right:max(20px,calc(env(safe-area-inset-right,0px) + 16px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:75;width:62px;height:62px;border-radius:50%;border:0;background:var(--navy);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 24px rgba(29,37,54,.28);transition:transform .2s}
+.fab:hover{transform:scale(1.06)}
+.fab .fabhead{position:absolute;right:-4px;bottom:-4px;width:26px;height:26px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;box-shadow:0 2px 6px rgba(29,37,54,.25)}
+.fab.open{transform:scale(.9)}
+.chatbox{position:fixed;right:max(20px,calc(env(safe-area-inset-right,0px) + 16px));bottom:calc(94px + env(safe-area-inset-bottom,0px));z-index:76;width:min(380px,calc(100vw - 32px));max-height:min(560px,calc(100vh - 140px));display:flex;flex-direction:column;gap:10px;padding:0 16px 14px;box-shadow:0 18px 50px rgba(29,37,54,.25);border-radius:16px;overflow:hidden}
+.chatbox[hidden]{display:none!important}
+.chathead{display:flex;align-items:center;gap:10px;margin:0 -16px;padding:12px 14px;background:var(--navy);color:#fff}
+.chathead b{display:block;font-size:1rem}
+.chathead span#aiStatus{display:block;font-size:.78rem;opacity:.85}
+.chatav{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);display:grid;place-items:center;flex:none}
+.chatav svg{width:22px;height:22px}
+.chatx{margin-left:auto;border:0;background:none;color:#fff;font-size:1.1rem;cursor:pointer;width:34px;height:34px;border-radius:50%}
+.chatx:hover{background:rgba(255,255,255,.15)}
+.chatbox .chat{flex:1;max-height:none;min-height:180px}
+.chatbox small{margin-top:0}
+.chatbox form{margin-top:0}
 .chat{display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto;padding-right:2px}
 .msg{padding:10px 12px;border-radius:12px;font-size:.93rem;white-space:pre-wrap;line-height:1.5}
 .msg.me{background:var(--navy);color:#fff;align-self:flex-end;max-width:88%;border-bottom-right-radius:4px}
@@ -445,6 +460,9 @@ footer .refs{line-height:1.7}
   .fixphoto{width:100%;height:240px}
   .fixhead,.about,.megrid,.profgrid{grid-template-columns:minmax(0,1fr);gap:20px}
   .contactgrid .nprow{flex-direction:column;align-items:stretch}
+  .chatbox{left:0;right:0;bottom:0;width:auto;max-height:calc(100% - 60px - env(safe-area-inset-top,0px));border-radius:16px 16px 0 0;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .chathead{margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)))}
+  .fab.open{display:none}
   .contactgrid .nprow .btn{width:100%}
   .nav .bellwrap{margin-left:auto}
   .bellmenu{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:calc(64px + env(safe-area-inset-top,0px));width:auto}
@@ -517,7 +535,7 @@ footer .refs{line-height:1.7}
     <a href="#about" data-sec="about">About us</a>
     <a href="#contact" data-sec="contact">Contact</a>
     <a href="#me" data-sec="me" id="meTab" hidden>My profile</a>
-    <a href="#assistant" class="ai-tab">Garage Assistant</a>
+    <a href="#assistant" class="ai-tab" data-chat>Garage Assistant</a>
   </nav>
 </header>
 
@@ -587,17 +605,6 @@ footer .refs{line-height:1.7}
     </div>
 
     <aside class="side-r">
-      <div class="panel ai" id="assistant">
-        <h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#24375F" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M4.5 16.5 9.5 13.5M19.5 16.5 14.5 13.5"/></svg>Garage Assistant</h3>
-        <p class="status" id="aiStatus">Quick answers any time. A real person can check it after.</p>
-        <div class="chat" id="chat" aria-live="polite"></div>
-
-        <form id="aiForm">
-          <textarea id="aiQ" placeholder="Describe what your car is doing" aria-label="Your question"></textarea>
-          <button class="send" type="submit" aria-label="Send">➤</button>
-        </form>
-        <small>The assistant gives a first idea. For brakes, steering, smoke or a fuel smell, stop and see a mechanic.</small>
-      </div>
 
 
       <div class="panel">
@@ -863,7 +870,7 @@ footer .refs{line-height:1.7}
     <h2>Before you hand over the money</h2>
     <p>Whatever you choose, book a pre-purchase inspection at an independent mechanic. It costs a little, but it can save you thousands. And if a seller asks way more than the fair range, walk away. There are always other Corollas.</p>
     <div class="pshare" data-title="Our top 2 first cars under $10k" data-link="#post-cars"></div>
-    <div class="pcta"><a class="btn" href="#cost">Try the True Cost tool</a><a class="btn ghost" href="#assistant">Ask the Garage Assistant</a></div>
+    <div class="pcta"><a class="btn" href="#cost">Try the True Cost tool</a><a class="btn ghost" href="#assistant" data-chat>Ask the Garage Assistant</a></div>
   </div>
 </article>
 
@@ -895,6 +902,18 @@ footer .refs{line-height:1.7}
     <div class="pcta"><a class="btn" href="#fix">Check another noise</a><button class="btn ghost" type="button" data-need="story">Share your brake story</button></div>
   </div>
 </article>
+</div>
+
+<!-- GARAGE ASSISTANT: floating chat -->
+<button class="fab" id="chatFab" type="button" aria-label="Open the Garage Assistant chat" aria-expanded="false" aria-controls="assistant"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M12 9.4V2.5M9.7 13.3 3.8 16.6M14.3 13.3l5.9 3.3" stroke="currentColor" stroke-width="2.2"/></svg><span class="fabhead"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="2.5" y="13" width="4" height="6" rx="1.5" fill="currentColor"/><rect x="17.5" y="13" width="4" height="6" rx="1.5" fill="currentColor"/><path d="M19.5 19c0 2-2 2.5-5 2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></span></button>
+<div class="panel ai chatbox" id="assistant" role="dialog" aria-label="Garage Assistant" hidden>
+  <div class="chathead"><span class="chatav"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="2.6" fill="currentColor"/><path d="M12 9.4V2.5M9.7 13.3 3.8 16.6M14.3 13.3l5.9 3.3" stroke="currentColor" stroke-width="2.2"/></svg></span><div><b>Garage Assistant</b><span id="aiStatus">Free for everyone, no account needed.</span></div><button class="chatx" id="chatClose" type="button" aria-label="Close chat">✕</button></div>
+  <div class="chat" id="chat" aria-live="polite"></div>
+  <form id="aiForm">
+    <textarea id="aiQ" placeholder="Describe what your car is doing" aria-label="Your question"></textarea>
+    <button class="send" type="submit" aria-label="Send">➤</button>
+  </form>
+  <small>A first idea, not a diagnosis. For brakes, steering, smoke or a fuel smell, stop and see a mechanic.</small>
 </div>
 
 <footer>
@@ -1226,6 +1245,15 @@ function wireNeed(root){(root||document).querySelectorAll('[data-need]').forEach
   openNewPost(b.dataset.cat)}})}
 renderFeed();wireNeed(document);
 
+/* ---------- FLOATING CHAT ---------- */
+function openChat(){$('assistant').hidden=false;$('chatFab').classList.add('open');$('chatFab').setAttribute('aria-expanded','true');var c=$('chat');c.scrollTop=c.scrollHeight;setTimeout(function(){$('aiQ').focus()},60)}
+function closeChat(){$('assistant').hidden=true;$('chatFab').classList.remove('open');$('chatFab').setAttribute('aria-expanded','false');$('chatFab').focus()}
+$('chatFab').onclick=function(){$('assistant').hidden?openChat():closeChat()};
+$('chatClose').onclick=closeChat;
+$('assistant').addEventListener('keydown',function(e){if(e.key==='Escape')closeChat()});
+document.querySelectorAll('[data-chat]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();openChat()})});
+if(location.hash==='#assistant')openChat();
+
 /* ---------- NEWSLETTER + CONTACT ---------- */
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)}
 $('newsForm').addEventListener('submit',async function(e){e.preventDefault();var v=$('newsEmail').value.trim().toLowerCase();
@@ -1316,7 +1344,7 @@ function drawFinder(){drawCats();var c=finder[curCat],sy=$('symptoms');sy.textCo
   var it=c.items[curItem],a=$('answer');a.textContent='';
   a.appendChild(el('span','urg '+it.u,it.ul));if(it.ic){var hd=el('div','ahead');var bx=el('div','dashbox');bx.appendChild(dashIcon(it.ic,it.col,44,it.blink));hd.appendChild(bx);var ht=el('div');ht.appendChild(el('h3',null,it.k));ht.appendChild(el('p','mute',it.blink?'Looks like this on your dashboard, blinking':'Looks like this on your dashboard'));hd.appendChild(ht);a.appendChild(hd)}else a.appendChild(el('h3',null,it.k));a.appendChild(el('p',null,it.cause));
   var g=el('dl','agrid');[['Price, by cause',it.price],['Usual repair time',it.time],['How sure is this?','Most common cause, not a diagnosis']].forEach(function(r){var d=el('div');d.appendChild(el('dt',null,r[0]));d.appendChild(el('dd',null,r[1]));g.appendChild(d)});a.appendChild(g);
-  var h=el('div','human');var av=el('span','av','MH');av.style.background='#24375F';h.appendChild(av);var t=el('p');var bb=el('b',null,'Our tip: ');t.appendChild(bb);t.appendChild(document.createTextNode(it.tip+' '));var l=el('a','link','Ask the Garage Assistant');l.href='#assistant';l.onclick=function(e){e.preventDefault();$('aiQ').value='My car: '+it.k.toLowerCase()+'. ';$('assistant').scrollIntoView({block:'center'});$('aiQ').focus()};t.appendChild(l);h.appendChild(t);a.appendChild(h)}
+  var h=el('div','human');var av=el('span','av','MH');av.style.background='#24375F';h.appendChild(av);var t=el('p');var bb=el('b',null,'Our tip: ');t.appendChild(bb);t.appendChild(document.createTextNode(it.tip+' '));var l=el('a','link','Ask the Garage Assistant');l.href='#assistant';l.onclick=function(e){e.preventDefault();$('aiQ').value='My car: '+it.k.toLowerCase()+'. ';openChat();$('aiQ').focus()};t.appendChild(l);h.appendChild(t);a.appendChild(h)}
 drawFinder();
 document.querySelectorAll('a[data-cat]').forEach(function(a){a.addEventListener('click',function(){curCat=a.dataset.cat;curItem=0;drawFinder()})});
 
@@ -1349,7 +1377,7 @@ function applyMember(){
     $('joinText').textContent=member.type==='enthusiast'?'You are an Enthusiast applicant. Help people in the Garage: our editors regularly review the most helpful members and give them the Verified Enthusiast badge.':'You can now post questions, reply and vote in the Garage.';
     $('authTabs').hidden=true;$('joinForm').hidden=true;$('loginForm').hidden=true;$('verifyBox').hidden=true;$('signUp').href='#me';paintMyAvatar();$('signIn').textContent='Log out'}
   else{$('joinTitle').textContent='Join the community';$('signUp').textContent='Join the community';$('signUp').href='#join';$('signIn').textContent='Log in'}
-  $('aiStatus').textContent='Free for everyone, no account needed. Ask anything about your car.'
+  $('aiStatus').textContent='Free for everyone, no account needed.'
 }
 (async function(){try{if(window.claude&&claude.use){sample=await claude.use('sample')}}catch(e){sample=null}applyMember()})();
 applyMember();
@@ -1375,7 +1403,7 @@ $('aiForm').addEventListener('submit',async function(e){e.preventDefault();var q
   $('chat').scrollTop=$('chat').scrollHeight;
   busy=false;document.querySelector('.ai .send').disabled=false});
 $('aiQ').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('aiForm').requestSubmit()}});
-$('heroAsk').addEventListener('submit',function(e){e.preventDefault();var q=$('heroQ').value.trim();$('assistant').scrollIntoView({block:'center'});if(q){$('aiQ').value=q;$('aiForm').requestSubmit();$('heroQ').value=''}else{$('aiQ').focus()}});
+$('heroAsk').addEventListener('submit',function(e){e.preventDefault();var q=$('heroQ').value.trim();openChat();if(q){$('aiQ').value=q;$('aiForm').requestSubmit();$('heroQ').value=''}else{$('aiQ').focus()}});
 $('topSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){$('heroQ').value=this.value;$('heroAsk').requestSubmit();this.value=''}});
 
 /* ---------- ACCOUNTS (Firebase email + password, email verification) ---------- */
