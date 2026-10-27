@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Drive Smart: a community car blog for students and first-time buyers in Kingston, Ontario.">
 <title>Drive Smart</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%2711%27 fill=%27%2324375F%27/%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%277%27 fill=%27%23F3EEE5%27/%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%272.4%27 fill=%27%2324375F%27/%3E%3Cpath d=%27M12 5.5v4M17.6 15.3l-3.4-2M6.4 15.3l3.4-2%27 stroke=%27%2324375F%27 stroke-width=%272.2%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
@@ -143,6 +144,8 @@ header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgrou
 .pricebox div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
 .pricebox span{display:block;font-size:.88rem;color:var(--mute)}
 .pricebox b{font-size:1.25rem;color:var(--navy)}
+.pshare{margin-top:28px;padding-top:16px;border-top:1px solid var(--line)}
+.pshare::before{content:"Share this post";display:block;font-weight:600;font-size:.9rem}
 .pcta{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
 body.reading main{display:none}
 .newpost{background:var(--card);border:1px solid #C9D3E3;border-radius:var(--r);padding:16px 18px;margin-bottom:14px;display:flex;flex-direction:column;gap:10px}
@@ -167,6 +170,29 @@ a.who:hover{color:var(--navy);text-decoration:underline}
 .tfoot .like.on{color:var(--navy)}
 .hav{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;background:#fff;color:var(--navy);font-size:.7rem;font-weight:700;overflow:hidden;vertical-align:middle;margin-right:2px}
 .hav img{width:100%;height:100%;object-fit:cover}
+.contactgrid{align-items:stretch}
+.contactgrid .panel{display:flex;flex-direction:column;gap:12px;padding:24px}
+.contactgrid h2{font-size:1.6rem}
+.contactgrid .panel.news{background:var(--sky);border-color:#C9D3E3}
+.contactgrid input,.cform textarea{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font:inherit;background:var(--paper);color:var(--ink)}
+.news input{background:var(--card)}
+.cform{display:flex;flex-direction:column;gap:10px}
+.cform textarea{min-height:100px;resize:vertical}
+.mailrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.mailrow span{font-weight:600;color:var(--navy);word-break:break-all;margin-right:4px}
+.bellwrap{position:relative;flex:none}
+.bell{position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--navy);display:grid;place-items:center;cursor:pointer}
+.bell .dot{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:999px;background:var(--rust);color:#fff;font-size:.68rem;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.bellmenu{position:absolute;right:0;top:46px;width:min(330px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(29,37,54,.16);z-index:60;padding:12px;max-height:70vh;overflow:auto}
+.bmhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.bmhead .linkbtn{font-size:.82rem}
+.nitem{display:block;width:100%;text-align:left;border:0;background:none;padding:10px 6px;border-bottom:1px solid var(--line);cursor:pointer;font:inherit;font-size:.9rem;color:var(--ink)}
+.nitem:last-child{border:0}
+.nitem.new{background:#EEF2F8;border-radius:8px}
+.nitem span{display:block;font-size:.8rem;color:var(--mute)}
+.sharemenu{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sharemenu a,.sharemenu button{font-size:.84rem;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:5px 12px;text-decoration:none;color:var(--ink);cursor:pointer;font-weight:600}
+.sharemenu a:hover,.sharemenu button:hover{border-color:var(--navy);color:var(--navy)}
 .modal{position:fixed;inset:0;background:rgba(20,26,40,.6);z-index:80;display:grid;place-items:center;padding:16px}
 .mbox{background:var(--card);border-radius:16px;padding:20px;width:min(340px,100%);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
 #cropCv{width:280px;height:280px;max-width:100%;border-radius:12px;touch-action:none;cursor:grab;background:#111}
@@ -414,6 +440,10 @@ footer .refs{line-height:1.7}
   .video{height:340px}
   .fixphoto{width:100%;height:240px}
   .fixhead,.about,.megrid,.profgrid{grid-template-columns:minmax(0,1fr);gap:20px}
+  .contactgrid .nprow{flex-direction:column;align-items:stretch}
+  .contactgrid .nprow .btn{width:100%}
+  .nav .bellwrap{margin-left:auto}
+  .bellmenu{position:fixed;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));top:calc(64px + env(safe-area-inset-top,0px));width:auto}
   .teamphoto img{aspect-ratio:1;object-position:50% 30%}
   .costimg{height:200px;min-height:0}
   .acct input,.acct select,.join .acct input{width:100%}
@@ -468,6 +498,8 @@ footer .refs{line-height:1.7}
       <input id="topSearch" type="search" placeholder="Ask about a car, a noise, a warning light">
     </label>
     <div class="social"><a href="#" data-soon="TikTok" aria-label="Drive Smart on TikTok (coming soon)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.2v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.6a5.9 5.9 0 1 0 5 5.8V9.1a7.4 7.4 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z"/></svg></a><a href="#" data-soon="Instagram" aria-label="Drive Smart on Instagram (coming soon)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a></div>
+    <div class="bellwrap" id="bellWrap" hidden><button class="bell" id="bellBtn" aria-label="Notifications" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.9"/></svg><span class="dot" id="bellCount" hidden></span></button>
+      <div class="bellmenu" id="bellMenu" hidden><div class="bmhead"><b>Notifications</b><button class="linkbtn" id="bellRead" type="button">Mark all as read</button></div><div id="bellList"></div></div></div>
     <div class="acctbtns"><a class="btn ghost sm" href="#join" id="signIn">Log in</a><a class="btn sm" href="#join" id="signUp">Join the community</a></div>
   </div>
   <nav class="wrap tabs" aria-label="Main">
@@ -479,6 +511,7 @@ footer .refs{line-height:1.7}
     <a href="#cost" data-sec="cost">True Cost tool</a>
     <a href="#video" data-sec="video">Videos</a>
     <a href="#about" data-sec="about">About us</a>
+    <a href="#contact" data-sec="contact">Contact</a>
     <a href="#me" data-sec="me" id="meTab" hidden>My profile</a>
     <a href="#assistant" class="ai-tab">Garage Assistant</a>
   </nav>
@@ -730,6 +763,31 @@ footer .refs{line-height:1.7}
   </div>
 </section>
 
+<!-- NEWSLETTER + CONTACT -->
+<section class="band" id="contact">
+  <div class="wrap two contactgrid">
+    <div class="panel news">
+      <h2>Get new posts by email</h2>
+      <p class="mute">One short email when we publish a new guide or a hot discussion starts in the Garage. No spam, unsubscribe any time.</p>
+      <form id="newsForm" class="nprow" novalidate>
+        <input id="newsEmail" type="email" placeholder="Your email" aria-label="Your email" autocomplete="email">
+        <button class="btn" type="submit">Subscribe</button>
+      </form>
+      <p class="npmsg" id="newsMsg" aria-live="polite"></p>
+    </div>
+    <div class="panel">
+      <h2>Contact us</h2>
+      <p class="mute">A question, an idea for a post, a car you want us to look at? Write to us.</p>
+      <p class="mailrow"><span id="mailAddr">drivesmart-cs@outlook.com</span><button class="btn ghost sm" type="button" id="copyMail">Copy</button><a class="btn ghost sm" href="mailto:drivesmart-cs@outlook.com">Open email</a></p>
+      <form id="contactForm" class="cform" novalidate>
+        <div class="nprow"><input id="cName" type="text" placeholder="Your name" aria-label="Your name" autocomplete="name"><input id="cEmail" type="email" placeholder="Your email" aria-label="Your email" autocomplete="email"></div>
+        <textarea id="cMsg" maxlength="2000" placeholder="Your message" aria-label="Your message"></textarea>
+        <p class="nprow"><button class="btn" type="submit">Send message</button><span class="npmsg" id="cInfo" aria-live="polite"></span></p>
+      </form>
+    </div>
+  </div>
+</section>
+
 <!-- JOIN -->
 <section class="band join" id="join" style="background:var(--sky)">
   <div class="wrap">
@@ -799,6 +857,7 @@ footer .refs{line-height:1.7}
 
     <h2>Before you hand over the money</h2>
     <p>Whatever you choose, book a pre-purchase inspection at an independent mechanic. It costs a little, but it can save you thousands. And if a seller asks way more than the fair range, walk away. There are always other Corollas.</p>
+    <div class="pshare" data-title="Our top 2 first cars under $10k" data-link="#post-cars"></div>
     <div class="pcta"><a class="btn" href="#cost">Try the True Cost tool</a><a class="btn ghost" href="#assistant">Ask the Garage Assistant</a></div>
   </div>
 </article>
@@ -827,6 +886,7 @@ footer .refs{line-height:1.7}
     <div class="pricebox"><div><span>Pads only, one axle, at a garage</span><b>about $120–250</b></div><div><span>Pads and discs, one axle, at a garage</span><b>about $250–450</b></div><div><span>Pads alone, if you or a friend can do it</span><b>about $50–100</b></div></div>
     <p>Usually only the front pads need changing, because the front brakes do most of the work. Ask the shop to show you the old pads and tell you how many millimetres are left. Most of the price is labour, so an independent garage is often cheaper than a dealer. If someone quotes "brakes all around" for $500 or more on a small car, get a second opinion.</p>
 
+    <div class="pshare" data-title="I hear a squeal when I brake. Do I need new pads?" data-link="#post-brakes"></div>
     <div class="pcta"><a class="btn" href="#fix">Check another noise</a><button class="btn ghost" type="button" data-need="story">Share your brake story</button></div>
   </div>
 </article>
@@ -834,7 +894,7 @@ footer .refs{line-height:1.7}
 
 <footer>
   <div class="wrap">
-    <div><span class="logo" aria-label="Drive Smart">Drive Sm<svg class="wh" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><circle cx="12" cy="12" r="7" fill="#F3EEE5"/><g><circle cx="12" cy="12" r="2.4" fill="currentColor"/><path d="M12 5.5v4M17.6 15.3l-3.4-2M6.4 15.3l3.4-2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></g></svg>rt</span><p style="margin-top:8px">Know the car. Know the cost. Drive smarter.</p><div class="social foot" style="margin-top:12px"><a href="#" data-soon="TikTok" aria-label="Drive Smart on TikTok (coming soon)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.2v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.6a5.9 5.9 0 1 0 5 5.8V9.1a7.4 7.4 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z"/></svg></a><a href="#" data-soon="Instagram" aria-label="Drive Smart on Instagram (coming soon)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a><span>@drivesmart · TikTok and Instagram coming soon</span></div><p style="margin-top:8px">© 2026 Maruan Hdioud and Cesar Breitner · COMM 339, Queen's University. Sponsored content is always labelled.</p></div>
+    <div><span class="logo" aria-label="Drive Smart">Drive Sm<svg class="wh" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><circle cx="12" cy="12" r="7" fill="#F3EEE5"/><g><circle cx="12" cy="12" r="2.4" fill="currentColor"/><path d="M12 5.5v4M17.6 15.3l-3.4-2M6.4 15.3l3.4-2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></g></svg>rt</span><p style="margin-top:8px">Know the car. Know the cost. Drive smarter.</p><div class="social foot" style="margin-top:12px"><a href="#" data-soon="TikTok" aria-label="Drive Smart on TikTok (coming soon)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.2v12.4a2.6 2.6 0 1 1-2.6-2.6c.3 0 .5 0 .8.1V9.6a5.9 5.9 0 1 0 5 5.8V9.1a7.4 7.4 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z"/></svg></a><a href="#" data-soon="Instagram" aria-label="Drive Smart on Instagram (coming soon)"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a><span>@drivesmart · TikTok and Instagram coming soon · drivesmart-cs@outlook.com</span></div><p style="margin-top:8px">© 2026 Maruan Hdioud and Cesar Breitner · COMM 339, Queen's University. Sponsored content is always labelled.</p></div>
     <p class="refs"><b style="color:var(--ink)">Sources:</b> Jerry (2023), <i>Americans united in confusion, distrust over car repair costs</i>, <a href="https://jerry.ai/studies/americans-united-in-confusion-distrust-over-car-repair-costs/">jerry.ai</a> · LendingTree (2022), <i>Car regrets survey</i>, <a href="https://www.lendingtree.com/auto/car-regrets-survey/">lendingtree.com</a> · Parkers (n.d.), <i>New study reveals severe lack of research undertaken by first car buyers</i>, <a href="https://www.parkers.co.uk/car-news/2019/new-study-reveals-severe-lack-of-research-undertaken-by-first-car-buyers/">parkers.co.uk</a> · Tucker, S. (2022), <i>Study: 40% of new car buyers have regrets</i>, <a href="https://www.kbb.com/car-news/study-40-of-new-car-buyers-have-regrets/">Kelley Blue Book</a> · <a href="https://www.reddit.com/r/whatcarshouldIbuy/">r/whatcarshouldIbuy</a> · <a href="https://www.topgear.com">Top Gear</a>. Price ranges on this page are typical Ontario estimates, not quotes.</p>
   </div>
 </footer>
@@ -935,8 +995,9 @@ function renderFeed(){
     fo.appendChild(likeBtn('t_'+t.id,t.uid));
     var rb=el('button',null,'💬 Reply');rb.onclick=function(){toggleReplies(t,rz,rb)};fo.appendChild(rb);
     var sv=el('button',saved[t.id]?'on':'',saved[t.id]?'Saved':'Save');sv.onclick=function(){if(!needAccount())return;saved[t.id]=!saved[t.id];sv.textContent=saved[t.id]?'Saved':'Save';sv.classList.toggle('on',!!saved[t.id]);savePrivate().catch(function(){});renderMe();toast(saved[t.id]?'Saved to your profile':'Removed from your profile')};fo.appendChild(sv);
-    var sh=el('button',null,'Share');sh.onclick=function(){var url=location.origin+location.pathname+(t.link||'#garage');
-      if(navigator.clipboard)navigator.clipboard.writeText(url).then(function(){toast('Link copied')},function(){toast(url)});else toast(url)};fo.appendChild(sh);
+    var sh=el('button',null,'Share');var smenu=null;sh.onclick=function(){var url=location.origin+location.pathname+(t.link||'#garage');
+      if(navigator.share&&matchMedia('(max-width:860px)').matches){navigator.share({title:t.t,text:'Drive Smart: '+t.t,url:url}).catch(function(){});return}
+      if(smenu){smenu.remove();smenu=null;return}smenu=shareMenu(t.t,url);fo.after(smenu)};fo.appendChild(sh);
     var fl=el('button',null,'Flag');fl.onclick=function(){if(!needAccount())return;if(db&&uid())dbWrite(function(){return db.collection('flags').add({thread:t.id,uid:uid(),created:ts()})}).catch(function(){});fl.textContent='Flagged';fl.disabled=true;toast('Thanks, an editor will review this post.')};fo.appendChild(fl);
     a.appendChild(fo);a.appendChild(rz);feed.appendChild(a);
     if(openThread===t.id)toggleReplies(t,rz,rb);
@@ -985,8 +1046,12 @@ var STATIC_THREADS=null;
 async function loadThreads(){if(!db)return;if(!STATIC_THREADS)STATIC_THREADS=threads.slice();
   try{var snap=await db.collection('threads').orderBy('created','desc').limit(100).get();var dyn=[];
     snap.forEach(function(d){var x=d.data();
-      dyn.push({id:d.id,f:x.cat,kind:KINDS[x.cat]||'Question',fc:x.cat==='talk'?'talk':'',t:x.title,ex:x.body||'',who:x.name||'Member',car:x.car||'',uid:x.uid,role:'',av:'#6F8BB8'})});
-    threads=dyn.concat(STATIC_THREADS);renderFeed();renderMe()}catch(e){}}
+      dyn.push({id:d.id,f:x.cat,kind:KINDS[x.cat]||'Question',fc:x.cat==='talk'?'talk':'',t:x.title,ex:x.body||'',who:x.name||'Member',car:x.car||'',uid:x.uid,created:x.created||null,role:'',av:'#6F8BB8'})});
+    threads=dyn.concat(STATIC_THREADS);renderFeed();renderMe();loadNotes()}catch(e){}}
+function shareMenu(title,url){var m=el('div','sharemenu'),e=encodeURIComponent,txt=e('Drive Smart: '+title+' '+url);
+  [['WhatsApp','https://wa.me/?text='+txt],['Facebook','https://www.facebook.com/sharer/sharer.php?u='+e(url)],['X','https://twitter.com/intent/tweet?text='+txt]]
+    .forEach(function(x){var a=el('a',null,x[0]);a.href=x[1];a.target='_blank';a.rel='noopener';m.appendChild(a)});
+  var c=el('button',null,'Copy link');c.type='button';c.onclick=function(){if(navigator.clipboard)navigator.clipboard.writeText(url).then(function(){toast('Link copied')},function(){toast(url)});else toast(url)};m.appendChild(c);return m}
 function loadCommunity(){loadThreads();loadPeople();loadLikes()}
 
 /* ---------- PROFILE ---------- */
@@ -1142,6 +1207,44 @@ function wireNeed(root){(root||document).querySelectorAll('[data-need]').forEach
   openNewPost(b.dataset.cat)}})}
 renderFeed();wireNeed(document);
 
+/* ---------- NEWSLETTER + CONTACT ---------- */
+function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)}
+$('newsForm').addEventListener('submit',async function(e){e.preventDefault();var v=$('newsEmail').value.trim().toLowerCase();
+  if(!validEmail(v)){$('newsMsg').textContent='Please enter a valid email address.';return}
+  $('newsMsg').textContent='Subscribing...';
+  try{if(db){await withTimeout(db.collection('newsletter').add({email:v.slice(0,120),created:ts()}))}
+    lsSet('ds-news','1');$('newsMsg').textContent=db?"You're in! Watch your inbox (and your spam folder, just in case).":'Demo mode: nothing was saved here.';$('newsEmail').value=''}
+  catch(err){$('newsMsg').textContent=errMsg(err)}});
+$('copyMail').onclick=function(){var v=$('mailAddr').textContent;if(navigator.clipboard)navigator.clipboard.writeText(v).then(function(){toast('Email copied')},function(){toast(v)});else toast(v)};
+$('contactForm').addEventListener('submit',async function(e){e.preventDefault();var n=$('cName').value.trim(),em=$('cEmail').value.trim(),m=$('cMsg').value.trim();
+  if(!n||!validEmail(em)||m.length<5){$('cInfo').textContent='Please fill in your name, a valid email and a message.';return}
+  $('cInfo').textContent='Sending...';
+  try{if(db){await withTimeout(db.collection('messages').add({name:n.slice(0,60),email:em.slice(0,120),message:m.slice(0,2000),created:ts()}))}
+    $('cInfo').textContent=db?'Thanks! We read every message and will answer by email.':'Demo mode: nothing was sent here.';$('cMsg').value=''}
+  catch(err){$('cInfo').textContent=errMsg(err)}});
+document.querySelectorAll('.pshare').forEach(function(d){d.appendChild(shareMenu(d.dataset.title,location.origin+location.pathname+d.dataset.link))});
+
+/* ---------- NOTIFICATIONS (bell) ---------- */
+var notes=[];
+function lastSeen(){return +(lsGet('ds-seen-'+(uid()||''))||0)}
+async function loadNotes(){if(!member||!db){$('bellWrap').hidden=!member;return}
+  $('bellWrap').hidden=false;var seen=lastSeen(),me=uid(),list=[];
+  threads.forEach(function(t){if(t.created&&t.created.seconds&&t.uid!==me)list.push({kind:'post',t:t,at:t.created.seconds*1000,text:t.who+' posted: '+t.t})});
+  try{var r=await db.collection('replies').where('threadOwner','==',me).get();
+    r.forEach(function(d){var x=d.data();if(x.uid===me||!x.created||!x.created.seconds)return;var t=threads.filter(function(y){return y.id===x.thread})[0];
+      list.push({kind:'reply',t:t,at:x.created.seconds*1000,text:(x.name||'Someone')+' replied to your post'+(t?': '+t.t:'')})})}catch(e){}
+  (profile.following||[]).length&&list.forEach(function(n){if(n.kind==='post'&&profile.following.indexOf(n.t.uid)>=0)n.text='⭐ '+n.text});
+  list.sort(function(a,b){return b.at-a.at});notes=list.slice(0,20);
+  var nNew=notes.filter(function(n){return n.at>seen}).length;$('bellCount').hidden=!nNew;$('bellCount').textContent=nNew>9?'9+':nNew;drawNotes()}
+function drawNotes(){var box=$('bellList'),seen=lastSeen();box.textContent='';
+  if(!notes.length){box.appendChild(el('p','mute','Nothing new yet. New posts and replies to your posts will show up here.'));return}
+  notes.forEach(function(n){var b=el('button','nitem'+(n.at>seen?' new':''));b.type='button';b.appendChild(document.createTextNode(n.text));
+    b.appendChild(el('span',null,when({toDate:function(){return new Date(n.at)}})));
+    b.onclick=function(){$('bellMenu').hidden=true;$('bellBtn').setAttribute('aria-expanded','false');if(n.t){openThread=n.t.id;setFilter('all');location.hash='#garage';setTimeout(function(){$('garage').scrollIntoView()},60)}};box.appendChild(b)})}
+$('bellBtn').onclick=function(e){e.stopPropagation();var m=$('bellMenu');m.hidden=!m.hidden;this.setAttribute('aria-expanded',String(!m.hidden));if(!m.hidden)drawNotes()};
+$('bellRead').onclick=function(){lsSet('ds-seen-'+(uid()||''),String(Date.now()));$('bellCount').hidden=true;drawNotes()};
+document.addEventListener('click',function(e){if(!$('bellWrap').contains(e.target))$('bellMenu').hidden=true});
+
 /* ---------- POLL ---------- */
 var opts=['2014 Toyota Corolla · 140,000 km','2013 Honda Civic · 160,000 km','2015 Mazda3 · 120,000 km'],pick=-1;
 function drawPoll(){var box=$('poll');box.textContent='';
@@ -1220,7 +1323,7 @@ function showVerify(email){$('joinForm').hidden=true;$('loginForm').hidden=true;
   $('verifyText').textContent='Almost done! We sent a link to '+email+'. Click it to confirm your email, then come back here.'}
 function applyMember(){
   var on=!!member;
-  $('welcomeBox').hidden=!on;$('me').hidden=!on;$('meTab').hidden=!on;if(on){fillEditor();renderMe()}
+  $('welcomeBox').hidden=!on;$('me').hidden=!on;$('meTab').hidden=!on;$('bellWrap').hidden=!on;if(on){loadNotes();if(auth&&auth.currentUser&&auth.currentUser.email&&!$('newsEmail').value)$('newsEmail').value=auth.currentUser.email}if(on){fillEditor();renderMe()}
   if(on){$('joinTitle').textContent='Welcome to the Garage, '+member.name+'!';
     $('joinText').textContent=member.type==='enthusiast'?'Thanks for applying as a Verified Enthusiast. We will send you a short car-knowledge check by email. Until then you can post and reply as a member.':'You can now post questions, reply and vote in the Garage.';
     $('authTabs').hidden=true;$('joinForm').hidden=true;$('loginForm').hidden=true;$('verifyBox').hidden=true;$('signUp').href='#me';paintMyAvatar();$('signIn').textContent='Log out'}
