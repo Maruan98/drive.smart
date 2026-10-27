@@ -167,6 +167,12 @@ a.who:hover{color:var(--navy);text-decoration:underline}
 .tfoot .like.on{color:var(--navy)}
 .hav{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;background:#fff;color:var(--navy);font-size:.7rem;font-weight:700;overflow:hidden;vertical-align:middle;margin-right:2px}
 .hav img{width:100%;height:100%;object-fit:cover}
+.modal{position:fixed;inset:0;background:rgba(20,26,40,.6);z-index:80;display:grid;place-items:center;padding:16px}
+.mbox{background:var(--card);border-radius:16px;padding:20px;width:min(340px,100%);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+#cropCv{width:280px;height:280px;max-width:100%;border-radius:12px;touch-action:none;cursor:grab;background:#111}
+#cropCv:active{cursor:grabbing}
+.zoomrow{display:flex;align-items:center;gap:10px;width:100%;font-weight:700;color:var(--mute)}
+.zoomrow input{flex:1;accent-color:var(--navy)}
 .profgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:24px;align-items:start}
 .profcard{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
 .bigav{position:relative;width:120px;height:120px;border-radius:50%;cursor:pointer;display:block;margin-bottom:8px}
@@ -407,7 +413,13 @@ footer .refs{line-height:1.7}
   .talkimg{height:260px}
   .video{height:340px}
   .fixphoto{width:100%;height:240px}
-  .fixhead,.about,.megrid,.profgrid{grid-template-columns:minmax(0,1fr);gap:20px}
+  .fixhead,.about,.megrid,.modal{position:fixed;inset:0;background:rgba(20,26,40,.6);z-index:80;display:grid;place-items:center;padding:16px}
+.mbox{background:var(--card);border-radius:16px;padding:20px;width:min(340px,100%);text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+#cropCv{width:280px;height:280px;max-width:100%;border-radius:12px;touch-action:none;cursor:grab;background:#111}
+#cropCv:active{cursor:grabbing}
+.zoomrow{display:flex;align-items:center;gap:10px;width:100%;font-weight:700;color:var(--mute)}
+.zoomrow input{flex:1;accent-color:var(--navy)}
+.profgrid{grid-template-columns:minmax(0,1fr);gap:20px}
   .teamphoto img{aspect-ratio:1;object-position:50% 30%}
   .costimg{height:200px;min-height:0}
   .acct input,.acct select,.join .acct input{width:100%}
@@ -687,6 +699,15 @@ footer .refs{line-height:1.7}
     <div class="panel profcard">
       <label class="bigav" for="photoIn" title="Change your photo"><span id="meAvatar"></span><span class="camera">Change photo</span></label>
       <input id="photoIn" type="file" accept="image/*" hidden>
+      <div id="cropModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+        <div class="mbox">
+          <h3 id="cropTitle">Adjust your photo</h3>
+          <p class="mute" style="font-size:.9rem">Drag to move. Use the slider to zoom.</p>
+          <canvas id="cropCv" width="280" height="280"></canvas>
+          <label class="zoomrow" for="cropZoom">− <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1"> +</label>
+          <p class="row2"><button class="btn" type="button" id="cropOk">Use this photo</button><button class="btn ghost" type="button" id="cropCancel">Cancel</button></p>
+        </div>
+      </div>
       <h2 id="meName"></h2>
       <p class="mute" id="meCar"></p>
       <p id="meBio"></p>
@@ -1052,11 +1073,28 @@ async function loadProfile(){profile={car:null,bio:'',photo:'',following:[]};
       var u=await db.collection('users').doc(uid()).get();if(u.exists){saved={};(u.data().saved||[]).forEach(function(k){saved[k]=true})}
       if(!d.exists)savePublic().catch(function(){})}catch(e){}}
   fillEditor();renderMe();renderFeed()}
-$('photoIn').onchange=function(){var f=this.files&&this.files[0];if(!f)return;if(!/^image\//.test(f.type)){$('profMsg').textContent='Choose an image file.';return}
-  var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var S=160,c=document.createElement('canvas');c.width=c.height=S;var g=c.getContext('2d');
-      var s=Math.min(img.width,img.height);g.drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,S,S);
-      profile.photo=c.toDataURL('image/jpeg',0.82);paintMyAvatar();$('profMsg').textContent='Saving photo...';
-      savePublic().then(function(){$('profMsg').textContent='Photo saved!';renderFeed()},function(e){$('profMsg').textContent=errMsg(e)})};img.src=rd.result};rd.readAsDataURL(f)};
+/* photo: choose, then move/zoom in a crop window */
+var crop={img:null,z:1,x:0,y:0};
+function cropScale(){var C=280;return Math.max(C/crop.img.width,C/crop.img.height)*crop.z}
+function clampCrop(){var C=280,sc=cropScale(),w=crop.img.width*sc,h=crop.img.height*sc,mx=(w-C)/2,my=(h-C)/2;crop.x=Math.max(-mx,Math.min(mx,crop.x));crop.y=Math.max(-my,Math.min(my,crop.y))}
+function drawCrop(target,size,mask){var g=target.getContext('2d'),k=size/280,sc=cropScale()*k,w=crop.img.width*sc,h=crop.img.height*sc;
+  g.clearRect(0,0,size,size);g.drawImage(crop.img,size/2-w/2+crop.x*k,size/2-h/2+crop.y*k,w,h);
+  if(mask){g.save();g.fillStyle='rgba(0,0,0,.55)';g.beginPath();g.rect(0,0,size,size);g.arc(size/2,size/2,size/2-4,0,Math.PI*2,true);g.fill('evenodd');
+    g.strokeStyle='rgba(255,255,255,.9)';g.lineWidth=2;g.beginPath();g.arc(size/2,size/2,size/2-4,0,Math.PI*2);g.stroke();g.restore()}}
+$('photoIn').onchange=function(){var f=this.files&&this.files[0];this.value='';if(!f)return;if(!/^image\//.test(f.type)){$('profMsg').textContent='Choose an image file.';return}
+  var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){crop={img:img,z:1,x:0,y:0};$('cropZoom').value=1;$('cropModal').hidden=false;drawCrop($('cropCv'),280,true);$('cropOk').focus()};img.src=rd.result};rd.readAsDataURL(f)};
+(function(){var cv=$('cropCv'),drag=null;
+  cv.addEventListener('pointerdown',function(e){if(!crop.img)return;drag={x:e.clientX,y:e.clientY,ox:crop.x,oy:crop.y};cv.setPointerCapture(e.pointerId)});
+  cv.addEventListener('pointermove',function(e){if(!drag)return;var r=cv.getBoundingClientRect(),k=280/r.width;crop.x=drag.ox+(e.clientX-drag.x)*k;crop.y=drag.oy+(e.clientY-drag.y)*k;clampCrop();drawCrop(cv,280,true)});
+  ['pointerup','pointercancel'].forEach(function(t){cv.addEventListener(t,function(){drag=null})});
+  cv.addEventListener('wheel',function(e){if(!crop.img)return;e.preventDefault();crop.z=Math.max(1,Math.min(4,crop.z*(e.deltaY<0?1.08:0.92)));$('cropZoom').value=crop.z;clampCrop();drawCrop(cv,280,true)},{passive:false});
+  $('cropZoom').addEventListener('input',function(){crop.z=+this.value;clampCrop();drawCrop(cv,280,true)});
+  $('cropCancel').onclick=function(){$('cropModal').hidden=true};
+  $('cropModal').addEventListener('keydown',function(e){if(e.key==='Escape')$('cropModal').hidden=true});
+  $('cropOk').onclick=function(){var out=document.createElement('canvas');out.width=out.height=200;drawCrop(out,200,false);
+    profile.photo=out.toDataURL('image/jpeg',0.85);$('cropModal').hidden=true;paintMyAvatar();$('profMsg').textContent='Saving photo...';
+    savePublic().then(function(){$('profMsg').textContent='Photo saved!';renderFeed()},function(e){$('profMsg').textContent=errMsg(e)})};
+})();
 $('profSave').onclick=async function(){var c=readCar();
   if(c&&(!c.make||!c.model)){$('profMsg').textContent='Choose or type the make and model of your car.';return}
   profile.car=c;profile.noCar=$('noCar').checked;if(profile.noCar)profile.car=null;
