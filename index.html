@@ -213,6 +213,16 @@ body.reading main{display:none}
 .cat svg{flex:none}
 .cat b{display:block;font-family:var(--f-head);font-size:1.05rem}
 .cat small{color:var(--mute)}
+.symptoms button.wic{display:inline-flex;align-items:center;gap:8px}
+.symptoms button.on .dash{filter:brightness(1.25)}
+.dash{display:inline-flex;line-height:0}
+.dash.blink{animation:blink 1s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.dash.blink{animation:none}}
+.ahead{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+.ahead h3{margin:0}
+.ahead p{font-size:.88rem;margin-top:2px}
+.dashbox{width:72px;height:72px;border-radius:14px;background:#141820;display:grid;place-items:center;flex:none;box-shadow:inset 0 0 0 2px #2a3040}
 .stepl{display:flex;align-items:center;gap:10px;font-weight:600;margin:0 0 10px}
 .stepl span{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:.85rem;flex:none}
 .symptoms{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
@@ -226,7 +236,7 @@ body.reading main{display:none}
 .agrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}
 .agrid div{background:var(--paper);border-radius:8px;padding:12px}
 .agrid dt{font:600 .74rem var(--f-head);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
-.agrid dd{margin:4px 0 0;font-weight:600}
+.agrid dd{margin:4px 0 0;font-weight:600;white-space:pre-line}
 .human{margin-top:16px;display:flex;gap:12px;align-items:flex-start;font-size:.94rem;border-top:1px dashed var(--line);padding-top:14px}
 
 /* car talk */
@@ -582,7 +592,7 @@ footer .refs{line-height:1.7}
     </div>
     <div>
       <h2 style="margin:8px 0 12px">Would You Buy It?</h2>
-      <p class="mute">A screen-recorded video where we go through real listings on Facebook Marketplace and Kijiji, like these Kingston ads. For each car we say what looks good, what looks wrong, and why the price is fair or too high. Then you vote: would you buy it? The first episode is coming soon. Found a listing you want us to look at? Send it to us.</p>
+      <p class="mute">A screen-recorded video where we go through real listings on Facebook Marketplace, like these Kingston ads. For each car we say what looks good, what looks wrong, and why the price is fair or too high. Then you vote: would you buy it? The first episode is coming soon. Found a listing you want us to look at? Send it to us.</p>
       <p style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap"><a class="btn" href="#garage">Vote in the Garage</a><a class="btn ghost" href="#join">Follow the series</a></p>
     </div>
   </div>
@@ -689,8 +699,8 @@ footer .refs{line-height:1.7}
     <p>With a squeal only, think a few weeks of normal driving, not months. If you wait until it grinds, you will need new discs too, and the bill roughly doubles.</p>
 
     <h2>What it should cost in Kingston</h2>
-    <div class="pricebox"><div><span>Pads only, one axle, at a garage</span><b>about $150–300</b></div><div><span>Pads and discs, one axle, at a garage</span><b>about $350–600</b></div><div><span>Pads alone, if you or a friend can do it</span><b>about $50–100</b></div></div>
-    <p>Usually only the front pads need changing, because the front brakes do most of the work. Ask the shop to show you the old pads and tell you how many millimetres are left. Most of the price is labour, so an independent garage is often cheaper than a dealer. If someone quotes "brakes all around" for $600 or more on a small car, get a second opinion.</p>
+    <div class="pricebox"><div><span>Pads only, one axle, at a garage</span><b>about $120–250</b></div><div><span>Pads and discs, one axle, at a garage</span><b>about $250–450</b></div><div><span>Pads alone, if you or a friend can do it</span><b>about $50–100</b></div></div>
+    <p>Usually only the front pads need changing, because the front brakes do most of the work. Ask the shop to show you the old pads and tell you how many millimetres are left. Most of the price is labour, so an independent garage is often cheaper than a dealer. If someone quotes "brakes all around" for $500 or more on a small car, get a second opinion.</p>
 
     <div class="pcta"><a class="btn" href="#fix">Check another noise</a><button class="btn ghost" type="button" data-need="post">Share your brake story</button></div>
   </div>
@@ -785,33 +795,40 @@ var icons={
 };
 var finder={
  light:{n:'A warning light',s:'On the dashboard',items:[
-  {k:'Check engine (steady)',cause:'Often something small: a loose gas cap, an oxygen sensor or a spark plug. A scan tells you the exact code.',u:'soon',ul:'Book a mechanic soon',price:'$0–450',time:'Free scan at most parts stores',tip:'Tighten the gas cap and drive a day or two. If the light stays on, get the code read before you pay for anything.',n:31},
-  {k:'Check engine (flashing)',cause:'The engine is misfiring. Unburnt fuel can overheat and damage the catalytic converter.',u:'stop',ul:'Stop driving soon',price:'$150–600',time:'Same day',tip:'Slow down, avoid hard acceleration and get to a shop. Driving far like this can turn a $200 fix into $2,000.',n:12},
-  {k:'Battery light',cause:'The car is not charging. Usually the alternator or a worn belt, sometimes just a loose cable.',u:'soon',ul:'Get it checked today',price:'$450–900',time:'1–2 hours',tip:'Turn off the heat and radio to save power and drive straight to a shop. The car can die once the battery is empty.',n:9},
-  {k:'Tire pressure (TPMS)',cause:'Very common when it gets cold in Kingston. Air pressure drops about 1 PSI for every 5°C.',u:'go',ul:'Fine to keep driving',price:'Free to $2 for air',time:'5 minutes',tip:'Check the pressure on the sticker inside the driver door and fill up at a gas station. If one tire keeps dropping, it may have a nail.',n:18}]},
+  {k:'Check engine (steady)',ic:'engine',col:'#E39B12',cause:'Often something small: a loose gas cap, an oxygen sensor or a spark plug. A scan tells you the exact code.',u:'soon',ul:'Book a mechanic soon',price:'Loose gas cap: free\nSensor or spark plugs: $100–250',time:'Free scan at most parts stores',tip:'Tighten the gas cap and drive a day or two. If the light stays on, get the code read before you pay for anything.',n:31},
+  {k:'Check engine (flashing)',ic:'engine',col:'#E39B12',blink:true,cause:'The engine is misfiring. Unburnt fuel can overheat and damage the catalytic converter.',u:'stop',ul:'Stop driving soon',price:'Spark plugs: $80–200\nIgnition coil: $100–250',time:'Same day',tip:'Slow down, avoid hard acceleration and get to a shop. Driving far like this can turn a $200 fix into $2,000.',n:12},
+  {k:'Battery light',ic:'battery',col:'#D2412F',cause:'The car is not charging. Start simple: it can be a loose battery cable, a worn belt, or in the worst case the alternator.',u:'soon',ul:'Get it checked today',price:'Loose cable: free to $50\nWorn belt: $80–150\nAlternator: $300–500',time:'1–2 hours',tip:'Turn off the heat and radio to save power and drive straight to a shop. The car can die once the battery is empty.',n:9},
+  {k:'Tire pressure (TPMS)',ic:'tpms',col:'#E39B12',cause:'Very common when it gets cold in Kingston. Air pressure drops about 1 PSI for every 5°C.',u:'go',ul:'Fine to keep driving',price:'Air: free to $2\nTire patch: $20–30',time:'5 minutes',tip:'Check the pressure on the sticker inside the driver door and fill up at a gas station. If one tire keeps dropping, it may have a nail.',n:18}]},
  noise:{n:'A strange noise',s:'Squeal, grind, click, hum',items:[
-  {k:'Squeal when braking',cause:'The brake pads are getting thin. A small metal tab squeals on purpose to warn you.',u:'soon',ul:'Book a mechanic soon',price:'$150–300 per axle',time:'About 1 hour',tip:'Ask the shop to show you the old pads. You usually only need the front ones.',n:22},
-  {k:'Grinding when braking',cause:'The pads are gone and metal is touching metal. The rotors are now being damaged too.',u:'stop',ul:'Stop driving soon',price:'$350–600 per axle',time:'1–2 hours',tip:'Every extra day makes the bill bigger and the brakes weaker. Drive gently to a shop.',n:8},
-  {k:'Clicking when turning',cause:'Usually a worn CV axle (the shaft that turns your front wheels). Common on older Civics and Corollas.',u:'soon',ul:'Book a mechanic soon',price:'$250–600',time:'1–2 hours',tip:'If the clicking gets louder or becomes a clunk, do not wait. A broken axle means the car stops moving.',n:11},
-  {k:'Humming that grows with speed',cause:'Often a wheel bearing, sometimes just worn or badly balanced tires.',u:'soon',ul:'Book a mechanic soon',price:'$300–600',time:'About 2 hours',tip:'Try this: if the hum changes when you turn left or right, it is very likely a bearing.',n:14}]},
+  {k:'Squeal when braking',cause:'The brake pads are getting thin. A small metal tab squeals on purpose to warn you.',u:'soon',ul:'Book a mechanic soon',price:'Morning rust: free\nFront pads: $120–250',time:'About 1 hour',tip:'Ask the shop to show you the old pads. You usually only need the front ones.',n:22},
+  {k:'Grinding when braking',cause:'The pads are gone and metal is touching metal. The rotors are now being damaged too.',u:'stop',ul:'Stop driving soon',price:'Pads and discs: $250–450 per axle',time:'1–2 hours',tip:'Every extra day makes the bill bigger and the brakes weaker. Drive gently to a shop.',n:8},
+  {k:'Clicking when turning',cause:'Usually a worn CV axle (the shaft that turns your front wheels). Common on older Civics and Corollas.',u:'soon',ul:'Book a mechanic soon',price:'CV axle: $150–350 per side',time:'1–2 hours',tip:'If the clicking gets louder or becomes a clunk, do not wait. A broken axle means the car stops moving.',n:11},
+  {k:'Humming that grows with speed',cause:'Often a wheel bearing, sometimes just worn or badly balanced tires.',u:'soon',ul:'Book a mechanic soon',price:'Tire balancing: $40–60\nWheel bearing: $200–350',time:'About 2 hours',tip:'Try this: if the hum changes when you turn left or right, it is very likely a bearing.',n:14}]},
  feel:{n:'It feels wrong',s:'Pulls, shakes, won\'t start',items:[
-  {k:'Pulls to one side',cause:'Usually the alignment, often after a pothole. Can also be one tire low on air.',u:'go',ul:'Fine to drive for now',price:'$100–160',time:'About 1 hour',tip:'Check tire pressure first. If it still pulls, an alignment also saves your tires.',n:10},
-  {k:'Shakes when braking',cause:'The brake rotors are warped or worn unevenly.',u:'soon',ul:'Book a mechanic soon',price:'$300–500 per axle',time:'1–2 hours',tip:'Usually fixed together with new pads. Ask for a price for both.',n:7},
-  {k:'Hard to start in the cold',cause:'Most of the time a weak battery. Batteries last about 4–5 years and the cold finishes them off.',u:'soon',ul:'Fix it before you get stuck',price:'$180–300',time:'30 minutes',tip:'Many parts stores test your battery for free. Keep booster cables in the trunk in winter.',n:16},
-  {k:'Shakes at idle',cause:'Often old spark plugs or an ignition coil, sometimes a worn engine mount.',u:'soon',ul:'Book a mechanic soon',price:'$150–450',time:'1–2 hours',tip:'If the check engine light is flashing too, treat it as urgent.',n:6}]},
+  {k:'Pulls to one side',cause:'Usually the alignment, often after a pothole. Can also be one tire low on air.',u:'go',ul:'Fine to drive for now',price:'Tire pressure: free\nAlignment: $80–120',time:'About 1 hour',tip:'Check tire pressure first. If it still pulls, an alignment also saves your tires.',n:10},
+  {k:'Shakes when braking',cause:'The brake rotors are warped or worn unevenly.',u:'soon',ul:'Book a mechanic soon',price:'Discs and pads: $250–400 per axle',time:'1–2 hours',tip:'Usually fixed together with new pads. Ask for a price for both.',n:7},
+  {k:'Hard to start in the cold',cause:'Most of the time a weak battery. Batteries last about 4–5 years and the cold finishes them off.',u:'soon',ul:'Fix it before you get stuck',price:'Battery test: free\nNew battery: $150–250',time:'30 minutes',tip:'Many parts stores test your battery for free. Keep booster cables in the trunk in winter.',n:16},
+  {k:'Shakes at idle',cause:'Often old spark plugs or an ignition coil, sometimes a worn engine mount.',u:'soon',ul:'Book a mechanic soon',price:'Spark plugs: $80–200\nIgnition coil: $100–250',time:'1–2 hours',tip:'If the check engine light is flashing too, treat it as urgent.',n:6}]},
  smell:{n:'A weird smell',s:'Sweet, burning, gas',items:[
-  {k:'Sweet, syrupy smell',cause:'Coolant is leaking. You might see a green or pink puddle under the car.',u:'soon',ul:'Get it checked this week',price:'$150–800',time:'1–3 hours',tip:'Watch the temperature gauge. If it climbs, pull over and turn off the engine. Never open a hot radiator cap.',n:5},
-  {k:'Burning oil',cause:'Oil is dripping on the hot engine, often from a valve cover gasket.',u:'soon',ul:'Book a mechanic soon',price:'$200–500',time:'1–2 hours',tip:'Check your oil level on the dipstick and top it up so the engine stays protected.',n:6},
-  {k:'Rotten eggs',cause:'Often the catalytic converter is struggling, sometimes just bad fuel.',u:'soon',ul:'Book a mechanic soon',price:'$0–1,500',time:'Depends',tip:'Try a different gas station first. If the smell stays, get it checked before it gets expensive.',n:4},
-  {k:'Raw gas smell',cause:'A fuel leak somewhere. This is a fire risk.',u:'stop',ul:'Stop driving now',price:'$100–600',time:'Same day',tip:'Park outside, do not start the car again and call a tow or a mechanic.',n:3}]}
+  {k:'Sweet, syrupy smell',cause:'Coolant is leaking. You might see a green or pink puddle under the car.',u:'soon',ul:'Get it checked this week',price:'Hose or clamp: $30–150\nRadiator or water pump: $300–600',time:'1–3 hours',tip:'Watch the temperature gauge. If it climbs, pull over and turn off the engine. Never open a hot radiator cap.',n:5},
+  {k:'Burning oil',cause:'Oil is dripping on the hot engine, often from a valve cover gasket.',u:'soon',ul:'Book a mechanic soon',price:'Oil top-up: about $15\nValve cover gasket: $100–300',time:'1–2 hours',tip:'Check your oil level on the dipstick and top it up so the engine stays protected.',n:6},
+  {k:'Rotten eggs',cause:'Often the catalytic converter is struggling, sometimes just bad fuel.',u:'soon',ul:'Book a mechanic soon',price:'Different gas station: free\nCatalytic converter: $600 and up',time:'Depends',tip:'Try a different gas station first. If the smell stays, get it checked before it gets expensive.',n:4},
+  {k:'Raw gas smell',cause:'A fuel leak somewhere. This is a fire risk.',u:'stop',ul:'Stop driving now',price:'Gas cap or fuel line: $20–300',time:'Same day',tip:'Park outside, do not start the car again and call a tow or a mechanic.',n:3}]}
 };
 var curCat='light',curItem=0;
 function drawCats(){var box=$('cats');box.textContent='';Object.keys(finder).forEach(function(k){var b=el('button','cat'+(k===curCat?' on':''));b.innerHTML=icons[k];var d=el('div');d.appendChild(el('b',null,finder[k].n));d.appendChild(el('small',null,finder[k].s));b.appendChild(d);b.onclick=function(){curCat=k;curItem=0;drawFinder()};box.appendChild(b)})}
+var DASH={
+ engine:'<path d="M7 6h6v2h2.5l2 2H20v-1h2v6h-2v-1h-2.5l-2 3H9l-2-2H5v2H3V9h2v2h2V8h2V6z" fill="currentColor"/><rect x="8" y="4" width="4" height="2" rx=".5" fill="currentColor"/>',
+ battery:'<rect x="2" y="7" width="20" height="13" rx="1.5" fill="currentColor"/><rect x="5" y="4.5" width="3" height="3" fill="currentColor"/><rect x="16" y="4.5" width="3" height="3" fill="currentColor"/><path d="M5 13.5h4M7 11.5v4M15 13.5h4" stroke="#fff" stroke-width="1.6"/>',
+ tpms:'<path d="M5 6c-1.6 2-2.4 4.2-2.4 6.5 0 2.4.9 4.6 2.4 6.5M19 6c1.6 2 2.4 4.2 2.4 6.5 0 2.4-.9 4.6-2.4 6.5M5 19h14M6.5 21.5l1-2.5M10 21.5l.5-2.5M14 21.5l-.5-2.5M17.5 21.5l-1-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 7v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="16" r="1.3" fill="currentColor"/>'
+};
+function dashIcon(k,color,size,blink){var w=document.createElement('span');w.className='dash'+(blink?' blink':'');w.style.color=color;
+  w.innerHTML='<svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" aria-hidden="true">'+DASH[k]+'</svg>';return w}
 function drawFinder(){drawCats();var c=finder[curCat],sy=$('symptoms');sy.textContent='';
-  c.items.forEach(function(it,i){var b=el('button',i===curItem?'on':'',it.k);b.onclick=function(){curItem=i;drawFinder()};sy.appendChild(b)});
+  c.items.forEach(function(it,i){var b=el('button',i===curItem?'on':'');if(it.ic){b.appendChild(dashIcon(it.ic,it.col,20,it.blink));b.classList.add('wic')}b.appendChild(document.createTextNode(it.k));b.onclick=function(){curItem=i;drawFinder()};sy.appendChild(b)});
   var it=c.items[curItem],a=$('answer');a.textContent='';
-  a.appendChild(el('span','urg '+it.u,it.ul));a.appendChild(el('h3',null,it.k));a.appendChild(el('p',null,it.cause));
-  var g=el('dl','agrid');[['Typical price in Ontario',it.price],['Usual repair time',it.time],['How sure is this?','Most common cause, not a diagnosis']].forEach(function(r){var d=el('div');d.appendChild(el('dt',null,r[0]));d.appendChild(el('dd',null,r[1]));g.appendChild(d)});a.appendChild(g);
+  a.appendChild(el('span','urg '+it.u,it.ul));if(it.ic){var hd=el('div','ahead');var bx=el('div','dashbox');bx.appendChild(dashIcon(it.ic,it.col,44,it.blink));hd.appendChild(bx);var ht=el('div');ht.appendChild(el('h3',null,it.k));ht.appendChild(el('p','mute',it.blink?'Looks like this on your dashboard, blinking':'Looks like this on your dashboard'));hd.appendChild(ht);a.appendChild(hd)}else a.appendChild(el('h3',null,it.k));a.appendChild(el('p',null,it.cause));
+  var g=el('dl','agrid');[['Price, by cause',it.price],['Usual repair time',it.time],['How sure is this?','Most common cause, not a diagnosis']].forEach(function(r){var d=el('div');d.appendChild(el('dt',null,r[0]));d.appendChild(el('dd',null,r[1]));g.appendChild(d)});a.appendChild(g);
   var h=el('div','human');var av=el('span','av','MH');av.style.background='#24375F';h.appendChild(av);var t=el('p');var bb=el('b',null,'Our tip: ');t.appendChild(bb);t.appendChild(document.createTextNode(it.tip+' '));var l=el('a','link','Ask the Garage Assistant');l.href='#assistant';l.onclick=function(e){e.preventDefault();$('aiQ').value='My car: '+it.k.toLowerCase()+'. ';$('assistant').scrollIntoView({block:'center'});$('aiQ').focus()};t.appendChild(l);h.appendChild(t);a.appendChild(h)}
 drawFinder();
 document.querySelectorAll('a[data-cat]').forEach(function(a){a.addEventListener('click',function(){curCat=a.dataset.cat;curItem=0;drawFinder()})});
@@ -828,7 +845,7 @@ function cost(){var P=+$('cP').value,r=+$('cR').value/1200,n=48,i=+$('cI').value
 
 /* ---------- GARAGE ASSISTANT (AI) ---------- */
 var sample=null,turns=[],busy=false;
-var SYS='You are the Garage Assistant on Drive Smart, a community car blog for students and first-time car owners in Kingston, Ontario, Canada. Talk like a friendly friend who knows cars: warm, plain words, no jargon (explain any technical word in a few words). Keep answers under 120 words. Focus on cars common in Canada, especially Japanese brands (Toyota, Honda, Mazda, Subaru, Nissan). When it is about a problem: give the most likely cause, say clearly how urgent it is (fine to drive / book a mechanic soon / stop driving), and give a rough fair price range in Canadian dollars. For anything about brakes failing, steering, smoke, overheating or a fuel smell, tell them to stop driving and get help. End with one short line inviting them to post in Ask the Garage so a verified enthusiast can confirm. Plain text only, no markdown.';
+var SYS='You are the Garage Assistant on Drive Smart, a community car blog for students and first-time car owners in Kingston, Ontario, Canada. Talk like a friendly friend who knows cars: warm, plain words, no jargon (explain any technical word in a few words). Keep answers under 120 words. Focus on cars common in Canada, especially Japanese brands (Toyota, Honda, Mazda, Subaru, Nissan). When it is about a problem: give the most likely cause, say clearly how urgent it is (fine to drive / book a mechanic soon / stop driving), and give a rough fair price range in Canadian dollars at an independent garage, starting with the cheapest possible cause. For anything about brakes failing, steering, smoke, overheating or a fuel smell, tell them to stop driving and get help. End with one short line inviting them to post in Ask the Garage so a verified enthusiast can confirm. Plain text only, no markdown.';
 function addMsg(cls,txt){var m=el('div','msg '+cls,txt);$('chat').appendChild(m);$('chat').scrollTop=$('chat').scrollHeight;return m}
 addMsg('note','Example of how it answers:');
 addMsg('me','My Civic makes a clicking noise when I turn. Is it bad?');
