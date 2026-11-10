@@ -1463,7 +1463,7 @@ var reviews=[],revStars=0;
 function drawReviews(){var box=$('reviews');if(!box)return;box.textContent='';
   if(!reviews.length){box.appendChild(el('div','rempty','No reviews yet. Used the site? Be the first to leave one below.'));return}
   reviews.slice(0,6).forEach(function(r){var c=el('div','rcard');c.appendChild(el('span','rs','★★★★★'.slice(0,r.stars)+'☆☆☆☆☆'.slice(0,5-r.stars)));c.appendChild(el('p',null,'"'+r.text+'"'));
-    var w=el('div','rwho');w.appendChild(avatar(r.name,r.uid,null,26));var p=r.uid&&people[r.uid];w.appendChild(el('span',null,r.name+(p&&p.car?' · '+p.car:'')));c.appendChild(w);box.appendChild(c)})}
+    var w=el('div','rwho');w.appendChild(avatar(r.name,r.uid,null,26));var p=r.uid&&people[r.uid];w.appendChild(el('span',null,r.name+(EDITORS[r.uid]?' · Co-founder':(p&&p.carLabel?' · '+p.carLabel:''))));c.appendChild(w);box.appendChild(c)})}
 function loadReviews(){if(!db)return drawReviews();db.collection('reviews').orderBy('created','desc').limit(12).get().then(function(q){reviews=[];q.forEach(function(d){var x=d.data();if(x&&x.text)reviews.push({uid:x.uid,name:x.name||'Member',stars:Math.max(1,Math.min(5,x.stars|0)),text:x.text})});drawReviews()}).catch(function(){drawReviews()})}
 
 
